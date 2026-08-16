@@ -103,5 +103,12 @@ sections:
         status: available
         url: works/differential-trigonometry.html
         video:
-          status: planned
+          status: available
           label: B站视频
+          links:
+            - label: "最新几何发现: 周长公式的证明"
+              url: https://www.bilibili.com/video/BV1uh4y1D7wz/
+            - label: "一种基于微分求直角三角形面积的前沿方法"
+              url: https://www.bilibili.com/video/BV19h4y1U7cm/
+            - label: "三角形内角和的全新证明, 你绝对没见过"
+              url: https://www.bilibili.com/video/BV1pm4y1T7Bt/
