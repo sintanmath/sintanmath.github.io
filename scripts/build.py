@@ -27,31 +27,46 @@ NESTED_APPS = (
 )
 
 CSS = r"""
-:root {
-  color-scheme: light dark;
-  --paper: #f7f1e3;
-  --paper-deep: #eee4d0;
-  --ink: #1e2421;
-  --muted: #696b62;
-  --line: #cfc4ae;
-  --accent: #9f2f28;
-  --accent-deep: #71201c;
-  --card: rgba(255, 252, 243, .72);
-  --wash: rgba(159, 47, 40, .065);
-  --shadow: rgba(59, 43, 27, .09);
+:root, html[data-theme="light"] {
+  color-scheme: light;
+  --paper: #eef3f3;
+  --paper-deep: #e1ebeb;
+  --ink: #1b2c2a;
+  --muted: #5c706d;
+  --line: #c5d4d3;
+  --accent: #2f7a6c;
+  --accent-deep: #21584e;
+  --card: rgba(247, 252, 251, .82);
+  --wash: rgba(47, 122, 108, .09);
+  --shadow: rgba(27, 55, 52, .08);
 }
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #121918;
+  --paper-deep: #18211f;
+  --ink: #dce7e4;
+  --muted: #9aada8;
+  --line: #2c3c39;
+  --accent: #7ec9b6;
+  --accent-deep: #a6ddd0;
+  --card: rgba(24, 33, 31, .84);
+  --wash: rgba(126, 201, 182, .1);
+  --shadow: rgba(0, 0, 0, .28);
+}
+html[data-theme="system"] { color-scheme: light dark; }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #171a18;
-    --paper-deep: #20231f;
-    --ink: #e9e2d2;
-    --muted: #aaa99f;
-    --line: #44463f;
-    --accent: #e18a7d;
-    --accent-deep: #f0aea5;
-    --card: rgba(35, 38, 34, .78);
-    --wash: rgba(225, 138, 125, .08);
-    --shadow: rgba(0, 0, 0, .2);
+  html[data-theme="system"] {
+    color-scheme: dark;
+    --paper: #121918;
+    --paper-deep: #18211f;
+    --ink: #dce7e4;
+    --muted: #9aada8;
+    --line: #2c3c39;
+    --accent: #7ec9b6;
+    --accent-deep: #a6ddd0;
+    --card: rgba(24, 33, 31, .84);
+    --wash: rgba(126, 201, 182, .1);
+    --shadow: rgba(0, 0, 0, .28);
   }
 }
 * { box-sizing: border-box; }
@@ -61,7 +76,7 @@ body {
   color: var(--ink);
   background:
     radial-gradient(circle at 18% 8%, var(--wash), transparent 28rem),
-    repeating-linear-gradient(0deg, transparent 0 27px, rgba(100, 85, 62, .025) 28px),
+    repeating-linear-gradient(0deg, transparent 0 27px, color-mix(in srgb, var(--ink) 3.5%, transparent) 28px),
     var(--paper);
   font-family: "Songti SC", "STSong", "Noto Serif CJK SC", Georgia, serif;
   font-size: 17px;
@@ -75,10 +90,48 @@ a:hover { color: var(--accent); }
   padding: 5.6rem 0 3.3rem;
   border-bottom: 1px solid var(--line);
 }
-.seal {
+.masthead-tools {
   position: absolute;
-  top: 2rem;
+  top: 1.15rem;
   right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .7rem;
+}
+.theme-switch {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px var(--shadow);
+}
+.theme-switch button {
+  margin: 0;
+  padding: .28rem .62rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.theme-switch button[aria-pressed="true"] {
+  color: var(--paper);
+  background: var(--accent);
+}
+.theme-switch button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.seal {
   width: 3.2rem;
   aspect-ratio: 1;
   display: grid;
@@ -203,16 +256,20 @@ h1 {
 }
 .status {
   padding: .16rem .58rem;
-  color: var(--accent-deep);
-  background: var(--wash);
-  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
   border-radius: 999px;
   font-size: .68rem;
   font-weight: 700;
   letter-spacing: .08em;
   white-space: nowrap;
 }
-.status.available { color: #27724c; background: rgba(39, 114, 76, .09); }
+.status.available {
+  color: var(--accent-deep);
+  background: var(--wash);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
 .video-link {
   display: inline-flex;
   align-items: center;
@@ -316,8 +373,8 @@ footer {
   font-size: .9rem;
 }
 @media (max-width: 650px) {
-  .masthead { padding-top: 4.7rem; }
-  .seal { top: 1.4rem; }
+  .masthead { padding-top: 5.2rem; }
+  .theme-switch button { padding: .26rem .46rem; font-size: .62rem; }
   .intro, .section-head { grid-template-columns: 1fr; gap: .8rem; }
   .project { grid-template-columns: 2.3rem 1fr; }
   .project-actions {
@@ -341,13 +398,62 @@ footer {
 """
 
 
+THEME_BOOT = """
+(function(){
+  try {
+    var t = localStorage.getItem("sintanmath-theme") || "system";
+    if (t !== "light" && t !== "dark") t = "system";
+    document.documentElement.dataset.theme = t;
+  } catch (e) {
+    document.documentElement.dataset.theme = "system";
+  }
+})();
+"""
+
+THEME_UI = """
+(function(){
+  function currentTheme() {
+    var t = document.documentElement.dataset.theme;
+    return t === "light" || t === "dark" ? t : "system";
+  }
+  function syncThemeButtons() {
+    var t = currentTheme();
+    document.querySelectorAll("[data-theme-value]").forEach(function(btn){
+      btn.setAttribute("aria-pressed", String(btn.getAttribute("data-theme-value") === t));
+    });
+  }
+  function setTheme(mode) {
+    var value = mode === "light" || mode === "dark" ? mode : "system";
+    document.documentElement.dataset.theme = value;
+    try { localStorage.setItem("sintanmath-theme", value); } catch (e) {}
+    syncThemeButtons();
+  }
+  document.querySelectorAll(".theme-switch").forEach(function(group){
+    group.addEventListener("click", function(event){
+      var btn = event.target.closest("[data-theme-value]");
+      if (!btn) return;
+      setTheme(btn.getAttribute("data-theme-value"));
+    });
+  });
+  syncThemeButtons();
+})();
+"""
+
+THEME_SWITCH = """
+        <div class="theme-switch" role="radiogroup" aria-label="外观模式">
+          <button type="button" data-theme-value="system">跟随系统</button>
+          <button type="button" data-theme-value="light">亮色</button>
+          <button type="button" data-theme-value="dark">暗色</button>
+        </div>"""
+
+
 def esc(value: object) -> str:
     return html.escape(str(value))
 
 
 def page(title: str, description: str, body: str) -> str:
     return f"""<!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="system">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -356,10 +462,12 @@ def page(title: str, description: str, body: str) -> str:
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <title>{esc(title)}</title>
+  <script>{THEME_BOOT}</script>
   <style>{CSS}</style>
 </head>
 <body>
 {body}
+<script>{THEME_UI}</script>
 </body>
 </html>
 """
@@ -522,7 +630,10 @@ def build_home(document: dict) -> str:
     body = f"""
   <header class="masthead">
     <div class="wrap">
-      <div class="seal" aria-hidden="true">数<br>学</div>
+      <div class="masthead-tools">
+        {THEME_SWITCH}
+        <div class="seal" aria-hidden="true">数<br>学</div>
+      </div>
       <p class="kicker">Personal mathematics archive</p>
       <h1>{esc(site["title"])}</h1>
       <p class="tagline">{esc(site["tagline"])}</p>

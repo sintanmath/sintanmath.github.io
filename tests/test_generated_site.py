@@ -28,6 +28,17 @@ class GeneratedSiteTests(unittest.TestCase):
         if snapshot.get("play"):
             self.assertIn("总播放", homepage)
 
+    def test_homepage_theme_switch_and_sage_palette(self) -> None:
+        homepage = (SITE / "index.html").read_text(encoding="utf-8")
+        self.assertIn('data-theme="system"', homepage)
+        self.assertIn("跟随系统", homepage)
+        self.assertIn("亮色", homepage)
+        self.assertIn("暗色", homepage)
+        self.assertIn("sintanmath-theme", homepage)
+        self.assertIn("--accent: #2f7a6c", homepage)
+        self.assertNotIn("#f7f1e3", homepage)
+        self.assertNotIn("#9f2f28", homepage)
+
     def test_pages_artifact_disables_jekyll(self) -> None:
         self.assertTrue((SITE / ".nojekyll").exists())
 
