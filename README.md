@@ -9,8 +9,11 @@
 ## 架构
 
 - `data/site.yaml`：唯一内容源
+- `data/bilibili.yaml`：B 站账号配置
+- `data/bilibili.json`：粉丝数等公开数据快照
 - `schema/site.schema.json`：内容结构约束
 - `scripts/validate.py`：构建前校验
+- `scripts/fetch_bilibili.py`：拉取 B 站公开数据
 - `scripts/build.py`：将 YAML 渲染成静态 HTML
 - `static/`：原样复制到输出目录的资源
 - `apps/`：需要单独构建的交互项目源码
@@ -26,7 +29,13 @@ python3 -m venv .venv
 .venv/bin/python -m http.server 8000 -d site
 ```
 
-构建交互应用还需要 Node.js 20 或更高版本。
+构建时会尝试刷新 B 站粉丝数；也可以单独运行：
+
+```bash
+.venv/bin/python scripts/fetch_bilibili.py
+```
+
+构建交互应用还需要 Node.js 20 或更高版本。线上站点每天会再拉一次公开数据。
 
 然后打开 `http://localhost:8000`。
 

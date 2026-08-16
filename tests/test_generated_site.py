@@ -19,6 +19,8 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("点 · 线 · 结构", homepage)
         self.assertIn("eml函数", homepage)
         self.assertIn("teorth.github.io/tao-web", homepage)
+        self.assertIn("粉丝", homepage)
+        self.assertIn("space.bilibili.com/490068376", homepage)
 
     def test_pages_artifact_disables_jekyll(self) -> None:
         self.assertTrue((SITE / ".nojekyll").exists())

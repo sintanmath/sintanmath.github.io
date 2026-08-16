@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import html
+import json
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -13,6 +15,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data" / "site.yaml"
+BILI_SNAPSHOT = ROOT / "data" / "bilibili.json"
 STATIC = ROOT / "static"
 SITE = ROOT / "site"
 APPS = ROOT / "apps"
@@ -128,6 +131,13 @@ h1 {
 .intro-copy p:first-child { margin-top: 0; }
 .intro-copy p:last-child { margin-bottom: 0; }
 .link-list { display: flex; flex-wrap: wrap; gap: .45rem 1rem; padding: 0; list-style: none; }
+.bili-stats {
+  margin: .9rem 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.bili-stats a { color: inherit; text-decoration: none; }
+.bili-stats a:hover { color: var(--accent); }
 .content-section { padding: 3.4rem 0 .4rem; }
 .section-head {
   display: grid;
@@ -291,6 +301,38 @@ def page(title: str, description: str, body: str) -> str:
 """
 
 
+def load_bilibili() -> dict | None:
+    if not BILI_SNAPSHOT.exists():
+        return None
+    document = json.loads(BILI_SNAPSHOT.read_text(encoding="utf-8"))
+    if not isinstance(document, dict) or "follower" not in document:
+        return None
+    return document
+
+
+def render_bilibili(stats: dict | None) -> str:
+    if not stats:
+        return ""
+    follower = stats.get("follower_label") or str(stats["follower"])
+    video = stats.get("video")
+    extra = f" · {video} 个视频" if video else ""
+    fetched = stats.get("fetched_at", "")
+    title = f' title="更新于 {esc(fetched[:10])}"' if fetched else ""
+    return (
+        f'<p class="bili-stats">'
+        f'<a href="{esc(stats["space_url"])}"{title}>'
+        f'B站 {esc(follower)}粉丝{esc(extra)}</a></p>'
+    )
+
+
+def refresh_bilibili_snapshot() -> None:
+    script = ROOT / "scripts" / "fetch_bilibili.py"
+    try:
+        subprocess.run([sys.executable, str(script)], check=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+
 def render_links(links: list[dict]) -> str:
     if not links:
         return '<p class="owner">相关链接待补充。</p>'
@@ -384,6 +426,7 @@ def build_home(document: dict) -> str:
       <div class="intro-copy">
         {profile_body}
         {render_links(profile["links"])}
+        {render_bilibili(load_bilibili())}
       </div>
     </section>
     {"".join(sections)}
@@ -431,6 +474,7 @@ def build_nested_app(name: str, url: str) -> None:
 
 
 def main() -> None:
+    refresh_bilibili_snapshot()
     document = yaml.safe_load(DATA.read_text(encoding="utf-8"))
 
     if SITE.exists():
