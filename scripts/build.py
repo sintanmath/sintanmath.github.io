@@ -233,6 +233,37 @@ h1 {
   cursor: default;
   opacity: .8;
 }
+.resource-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .28rem;
+  color: var(--accent-deep);
+  font-size: .74rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.resource-link::before {
+  content: "⬇";
+  font-size: .7rem;
+}
+.resource-link:hover { text-decoration: underline; }
+.cta-link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  margin-top: 1.35rem;
+  padding: .72rem 1.15rem;
+  color: var(--paper);
+  background: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.cta-link:hover {
+  color: var(--paper);
+  background: var(--accent-deep);
+}
 .video-links {
   display: flex;
   flex-wrap: wrap;
@@ -292,6 +323,7 @@ footer {
   .project-actions {
     grid-column: 2;
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
   }
 }
@@ -392,12 +424,22 @@ def render_links(links: list[dict]) -> str:
     return f'<ul class="link-list">{items}</ul>'
 
 
-def render_video_anchor(label: str, url: str) -> str:
+def render_outbound_anchor(class_name: str, label: str, url: str) -> str:
     return (
-        f'<a class="video-link" href="{esc(url)}" '
+        f'<a class="{esc(class_name)}" href="{esc(url)}" '
         f'target="_blank" rel="noopener noreferrer">'
         f'{esc(label)}</a>'
     )
+
+
+def render_video_anchor(label: str, url: str) -> str:
+    return render_outbound_anchor("video-link", label, url)
+
+
+def render_resource(resource: dict | None, class_name: str = "resource-link") -> str:
+    if not resource:
+        return ""
+    return render_outbound_anchor(class_name, resource["label"], resource["url"])
 
 
 def render_video(video: dict) -> str:
@@ -420,6 +462,7 @@ def render_project(item: dict, index: int) -> str:
     if video.get("links"):
         extra = video_html
         action_video = ""
+    resource_html = render_resource(item.get("resource"))
     return f"""
       <li class="project">
         <span class="index">{index:02d}</span>
@@ -431,6 +474,7 @@ def render_project(item: dict, index: int) -> str:
         <div class="project-actions">
           <span class="status {esc(status)}">{label}</span>
           {action_video}
+          {resource_html}
         </div>
       </li>"""
 
@@ -486,11 +530,14 @@ def build_home(document: dict) -> str:
 
 def build_placeholder(item: dict, section: dict, site: dict) -> str:
     kind_label = "交互数学内容" if section["kind"] == "interactive" else "数学功法"
-    format_note = (
-        "这里将放置一个独立运行的交互式网页项目。"
-        if section["kind"] == "interactive"
-        else "这里将发布静态网页或 PDF 内容。"
-    )
+    resource = item.get("resource")
+    if resource:
+        format_note = "网页讲义仍在整理。配套课件已放在夸克网盘，点击即可打开。"
+    elif section["kind"] == "interactive":
+        format_note = "这里将放置一个独立运行的交互式网页项目。"
+    else:
+        format_note = "这里将发布静态网页或 PDF 内容。"
+    resource_html = render_resource(resource, "cta-link")
     body = f"""
   <main class="placeholder-main wrap">
     <a class="back" href="../index.html">← 返回主页</a>
@@ -499,6 +546,7 @@ def build_placeholder(item: dict, section: dict, site: dict) -> str:
       <h1>{esc(item["title"])}</h1>
       <p class="description">{esc(item["description"])}</p>
       <p class="notice"><strong>制作中</strong> · {esc(format_note)}</p>
+      {resource_html}
       <p>{render_video(item["video"])}</p>
     </article>
   </main>

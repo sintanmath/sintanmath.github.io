@@ -80,6 +80,17 @@ class GeneratedSiteTests(unittest.TestCase):
                 self.assertNotIn("<strong>制作中</strong>", content)
                 self.assertIn("返回仙童数学主页", content)
 
+    def test_trigonometry_courseware_opens_quark_share(self) -> None:
+        quark_url = "https://pan.quark.cn/s/c08341b3a3e8"
+        homepage = (SITE / "index.html").read_text(encoding="utf-8")
+        placeholder = (SITE / "works" / "trigonometry-human.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("配套课件", homepage)
+        self.assertIn(quark_url, homepage)
+        self.assertIn(quark_url, placeholder)
+        self.assertIn('target="_blank"', homepage)
+
     def test_every_project_has_a_video_slot(self) -> None:
         homepage = (SITE / "index.html").read_text(encoding="utf-8")
         self.assertEqual(homepage.count("视频待补充"), 2)

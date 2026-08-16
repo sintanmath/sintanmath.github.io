@@ -67,6 +67,15 @@
                 "description": {"type": "string", "minLength": 1},
                 "status": {"enum": ["building", "available"]},
                 "url": {"type": "string", "minLength": 1},
+                "resource": {
+                  "type": "object",
+                  "required": ["label", "url"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "label": {"type": "string", "minLength": 1},
+                    "url": {"type": "string", "minLength": 1}
+                  }
+                },
                 "video": {
                   "type": "object",
                   "required": ["status", "label"],
