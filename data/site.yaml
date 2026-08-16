@@ -59,8 +59,9 @@ sections:
         status: available
         url: apps/eml-function/
         video:
-          status: planned
+          status: available
           label: B站视频
+          url: https://www.bilibili.com/video/BV1ZhdSB6E7E
 
   - id: methods
     title: 数学功法
@@ -83,8 +84,19 @@ sections:
         status: available
         url: works/immortal-geometry.html
         video:
-          status: planned
+          status: available
           label: B站视频
+          links:
+            - label: "全新勾股定理! 1+1=2"
+              url: https://www.bilibili.com/video/BV1BU4HzVE1j/
+            - label: "全新几何学: 直角等于 1 度"
+              url: https://www.bilibili.com/video/BV17o4vzLEAH/
+            - label: "全新面积公式: S=3a^2"
+              url: https://www.bilibili.com/video/BV1JmWxzSE9Y/
+            - label: "我发明了方形量角器!!!"
+              url: https://www.bilibili.com/video/BV13gCnBJEod/
+            - label: "仙式几何原本之凡人导读"
+              url: https://www.bilibili.com/video/BV1bpUWBvETi/
       - id: differential-trigonometry
         title: 微分三角
         description: 以卷轴式网页呈现微分思想与三角结构之间的联系。

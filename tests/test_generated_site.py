@@ -66,7 +66,17 @@ class GeneratedSiteTests(unittest.TestCase):
 
     def test_every_project_has_a_video_slot(self) -> None:
         homepage = (SITE / "index.html").read_text(encoding="utf-8")
-        self.assertEqual(homepage.count("视频待补充"), 6)
+        self.assertEqual(homepage.count("视频待补充"), 4)
+        self.assertIn("BV1ZhdSB6E7E", homepage)
+        for bvid in (
+            "BV1BU4HzVE1j",
+            "BV17o4vzLEAH",
+            "BV1JmWxzSE9Y",
+            "BV13gCnBJEod",
+            "BV1bpUWBvETi",
+        ):
+            with self.subTest(bvid=bvid):
+                self.assertIn(bvid, homepage)
 
     def test_generated_pages_have_no_runtime_ai_calls(self) -> None:
         forbidden = ("api.openai.com", "anthropic.com", "generativelanguage.googleapis.com")

@@ -194,6 +194,15 @@ h1 {
   cursor: default;
   opacity: .8;
 }
+.video-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem .85rem;
+  margin-top: .7rem;
+}
+.video-links .video-link {
+  white-space: normal;
+}
 footer {
   margin-top: 4rem;
   padding: 1.4rem 0 3rem;
@@ -292,32 +301,47 @@ def render_links(links: list[dict]) -> str:
     return f'<ul class="link-list">{items}</ul>'
 
 
+def render_video_anchor(label: str, url: str) -> str:
+    return (
+        f'<a class="video-link" href="{esc(url)}" '
+        f'target="_blank" rel="noopener noreferrer">'
+        f'{esc(label)}</a>'
+    )
+
+
+def render_video(video: dict) -> str:
+    if video["status"] != "available":
+        return '<span class="video-link pending">视频待补充</span>'
+    links = video.get("links")
+    if links:
+        items = "".join(render_video_anchor(link["label"], link["url"]) for link in links)
+        return f'<div class="video-links">{items}</div>'
+    return render_video_anchor(video["label"], video["url"])
+
+
 def render_project(item: dict, index: int) -> str:
     status = item["status"]
     label = "已发布" if status == "available" else "制作中"
-    video = render_video(item["video"])
+    video = item["video"]
+    video_html = render_video(video)
+    extra = ""
+    action_video = video_html
+    if video.get("links"):
+        extra = video_html
+        action_video = ""
     return f"""
       <li class="project">
         <span class="index">{index:02d}</span>
         <div>
           <h3><a href="{esc(item["url"])}">{esc(item["title"])}</a></h3>
           <p>{esc(item["description"])}</p>
+          {extra}
         </div>
         <div class="project-actions">
           <span class="status {esc(status)}">{label}</span>
-          {video}
+          {action_video}
         </div>
       </li>"""
-
-
-def render_video(video: dict) -> str:
-    if video["status"] == "available":
-        return (
-            f'<a class="video-link" href="{esc(video["url"])}" '
-            f'target="_blank" rel="noopener noreferrer">'
-            f'{esc(video["label"])}</a>'
-        )
-    return '<span class="video-link pending">视频待补充</span>'
 
 
 def build_home(document: dict) -> str:

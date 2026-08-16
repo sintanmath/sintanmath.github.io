@@ -74,7 +74,20 @@
                   "properties": {
                     "status": {"enum": ["planned", "available"]},
                     "label": {"type": "string", "minLength": 1},
-                    "url": {"type": "string", "minLength": 1}
+                    "url": {"type": "string", "minLength": 1},
+                    "links": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["label", "url"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "label": {"type": "string", "minLength": 1},
+                          "url": {"type": "string", "minLength": 1}
+                        }
+                      }
+                    }
                   },
                   "allOf": [
                     {
@@ -82,7 +95,12 @@
                         "properties": {"status": {"const": "available"}},
                         "required": ["status"]
                       },
-                      "then": {"required": ["url"]}
+                      "then": {
+                        "anyOf": [
+                          {"required": ["url"]},
+                          {"required": ["links"]}
+                        ]
+                      }
                     }
                   ]
                 }
