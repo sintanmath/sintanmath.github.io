@@ -31,6 +31,14 @@ class GeneratedSiteTests(unittest.TestCase):
     def test_pages_artifact_disables_jekyll(self) -> None:
         self.assertTrue((SITE / ".nojekyll").exists())
 
+    def test_homepage_uses_avatar_favicon(self) -> None:
+        homepage = (SITE / "index.html").read_text(encoding="utf-8")
+        self.assertIn('rel="icon"', homepage)
+        self.assertIn("/favicon.png", homepage)
+        self.assertTrue((SITE / "favicon.png").exists())
+        self.assertTrue((SITE / "favicon.ico").exists())
+        self.assertTrue((SITE / "apple-touch-icon.png").exists())
+
     def test_building_placeholder_pages_exist(self) -> None:
         expected = [
             "apps/infinite-sum-game.html",
