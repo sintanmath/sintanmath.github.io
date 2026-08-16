@@ -16,6 +16,7 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("个人介绍", homepage)
         self.assertIn("交互数学内容", homepage)
         self.assertIn("数学功法", homepage)
+        self.assertIn("点 · 线 · 结构", homepage)
         self.assertIn("teorth.github.io/tao-web", homepage)
 
     def test_pages_artifact_disables_jekyll(self) -> None:
@@ -33,6 +34,14 @@ class GeneratedSiteTests(unittest.TestCase):
                 self.assertTrue(page.exists())
                 self.assertIn("制作中", page.read_text(encoding="utf-8"))
 
+    def test_workbench_app_is_published(self) -> None:
+        page = SITE / "apps" / "geometric-discovery-workbench" / "index.html"
+        self.assertTrue(page.exists())
+        content = page.read_text(encoding="utf-8")
+        self.assertIn("点 · 线 · 结构", content)
+        self.assertNotIn("<strong>制作中</strong>", content)
+        self.assertTrue((page.parent / "assets").is_dir())
+
     def test_published_scroll_pages_are_preserved(self) -> None:
         expected_titles = {
             "works/immortal-geometry.html": "地阶残卷·仙式几何篇",
@@ -47,7 +56,7 @@ class GeneratedSiteTests(unittest.TestCase):
 
     def test_every_project_has_a_video_slot(self) -> None:
         homepage = (SITE / "index.html").read_text(encoding="utf-8")
-        self.assertEqual(homepage.count("视频待补充"), 5)
+        self.assertEqual(homepage.count("视频待补充"), 6)
 
     def test_generated_pages_have_no_runtime_ai_calls(self) -> None:
         forbidden = ("api.openai.com", "anthropic.com", "generativelanguage.googleapis.com")

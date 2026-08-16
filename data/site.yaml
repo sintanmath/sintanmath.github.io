@@ -37,6 +37,14 @@ sections:
       每个项目都是相互独立的网页应用。
     kind: interactive
     items:
+      - id: geometric-discovery-workbench
+        title: 点 · 线 · 结构
+        description: 从正多面体到球杆连接，再到多方向节点系统的交互式三维几何实验台。
+        status: available
+        url: apps/geometric-discovery-workbench/
+        video:
+          status: planned
+          label: B站视频
       - id: infinite-sum-game
         title: 无穷求和游戏
         description: 一个关于无穷级数、部分和与收敛直觉的交互式数学项目。

@@ -13,6 +13,7 @@
 - `scripts/validate.py`：构建前校验
 - `scripts/build.py`：将 YAML 渲染成静态 HTML
 - `static/`：原样复制到输出目录的资源
+- `apps/`：需要单独构建的交互项目源码
 - `site/`：生成结果，不要直接编辑
 
 ## 本地使用
@@ -24,6 +25,8 @@ python3 -m venv .venv
 .venv/bin/python scripts/build.py
 .venv/bin/python -m http.server 8000 -d site
 ```
+
+构建交互应用还需要 Node.js 20 或更高版本。
 
 然后打开 `http://localhost:8000`。
 
@@ -37,5 +40,7 @@ python3 -m venv .venv
 - 添加视频时，将项目的 `video.status` 改成 `available`，并填写 B 站
   `video.url`；未填写时主页会显示“视频待补充”。
 
-交互项目建议放在 `static/apps/<项目名>/`，数学功法网页或 PDF 建议放在
-`static/works/<项目名>/`。构建时 `static/` 会被完整复制到 `site/`。
+交互项目建议放在 `static/apps/<项目名>/`，需要打包的应用放在
+`apps/<项目名>/`；数学功法网页或 PDF 建议放在 `static/works/<项目名>/`。
+构建时 `static/` 会被完整复制到 `site/`，`apps/` 中的项目会先构建再写入
+对应入口。

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import html
 import shutil
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -14,6 +15,13 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data" / "site.yaml"
 STATIC = ROOT / "static"
 SITE = ROOT / "site"
+APPS = ROOT / "apps"
+NESTED_APPS = (
+    {
+        "name": "geometric-discovery-workbench",
+        "url": "apps/geometric-discovery-workbench",
+    },
+)
 
 CSS = r"""
 :root {
@@ -382,6 +390,22 @@ def build_placeholder(item: dict, section: dict, site: dict) -> str:
     return page(f'{item["title"]} — {site["title"]}', item["description"], body)
 
 
+def build_nested_app(name: str, url: str) -> None:
+    app = APPS / name
+    if not app.exists():
+        raise SystemExit(f"Missing nested app: {app}")
+
+    if not (app / "node_modules").exists():
+        subprocess.run(["npm", "ci"], cwd=app, check=True)
+    subprocess.run(["npm", "test"], cwd=app, check=True)
+    subprocess.run(["npm", "run", "build"], cwd=app, check=True)
+
+    destination = SITE / url
+    if destination.exists():
+        shutil.rmtree(destination)
+    shutil.copytree(app / "dist", destination)
+
+
 def main() -> None:
     document = yaml.safe_load(DATA.read_text(encoding="utf-8"))
 
@@ -407,6 +431,9 @@ def main() -> None:
                     encoding="utf-8",
                     newline="\n",
                 )
+
+    for app in NESTED_APPS:
+        build_nested_app(app["name"], app["url"])
 
     print(
         f"Built homepage and "
