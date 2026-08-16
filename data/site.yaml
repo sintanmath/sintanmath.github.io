@@ -1,0 +1,87 @@
+site:
+  title: 仙童数学
+  owner: 仙童数学 · sintanmath
+  tagline: 把抽象的数学，变成可以看见、操作和传播的内容
+  description: >-
+    仙童数学（sintanmath）的个人数学主页，集中整理数学科普内容、
+    交互数学项目与数学功法。
+  footer: 本站内容由结构化数据生成，并持续维护；网站结构与样式参考 Terence Tao 的 tao-web。
+
+profile:
+  heading: 个人介绍
+  body:
+    - >-
+      我是仙童数学，英文名 sintanmath，一名持续创作数学科普内容的博主。
+      我希望把抽象概念转化为更直观、更有趣，也更容易参与的数学内容。
+    - >-
+      公开内容涵盖趣味数学、几何、微积分、流形与微分几何导读、
+      数学工具等主题。这个主页用于长期整理视频之外的交互实验、
+      专题讲义和“数学功法”，让每个作品拥有独立、稳定的网页入口。
+    - >-
+      本站的数据驱动结构和克制的学术主页风格参考了数学家
+      Terence Tao 的 tao-web；具体内容与视觉表达则围绕仙童数学持续发展。
+  links:
+    - label: 仙童数学 · B站主页
+      url: https://space.bilibili.com/490068376
+    - label: GitHub 主页源码
+      url: https://github.com/sintanmath/sintanmath.github.io
+    - label: Terence Tao · tao-web
+      url: https://teorth.github.io/tao-web/index.html
+
+sections:
+  - id: interactive
+    title: 交互数学内容
+    eyebrow: Interactive mathematics
+    description: >-
+      可在浏览器中直接操作的数学实验、游戏与可视化工具。
+      每个项目都是相互独立的网页应用。
+    kind: interactive
+    items:
+      - id: infinite-sum-game
+        title: 无穷求和游戏
+        description: 一个关于无穷级数、部分和与收敛直觉的交互式数学项目。
+        status: building
+        url: apps/infinite-sum-game.html
+        video:
+          status: planned
+          label: B站视频
+      - id: eml-function
+        title: eml函数
+        description: 围绕 eml 函数展开的交互式探索项目。
+        status: building
+        url: apps/eml-function.html
+        video:
+          status: planned
+          label: B站视频
+
+  - id: methods
+    title: 数学功法
+    eyebrow: Mathematical methods
+    description: >-
+      以静态网页或 PDF 形式整理的数学方法、思路和专题讲义。
+    kind: static
+    items:
+      - id: trigonometry-human
+        title: 三角函数人阶篇
+        description: 三角函数基础方法与思维路径的系统整理。
+        status: building
+        url: works/trigonometry-human.html
+        video:
+          status: planned
+          label: B站视频
+      - id: immortal-geometry
+        title: 仙式几何
+        description: 以卷轴式网页呈现的几何方法、构造与解题视角专题。
+        status: available
+        url: works/immortal-geometry.html
+        video:
+          status: planned
+          label: B站视频
+      - id: differential-trigonometry
+        title: 微分三角
+        description: 以卷轴式网页呈现微分思想与三角结构之间的联系。
+        status: available
+        url: works/differential-trigonometry.html
+        video:
+          status: planned
+          label: B站视频

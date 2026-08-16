@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Personal mathematics site",
+  "type": "object",
+  "required": ["site", "profile", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "site": {
+      "type": "object",
+      "required": ["title", "owner", "tagline", "description", "footer"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "tagline": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1},
+        "footer": {"type": "string", "minLength": 1}
+      }
+    },
+    "profile": {
+      "type": "object",
+      "required": ["heading", "body", "links"],
+      "additionalProperties": false,
+      "properties": {
+        "heading": {"type": "string", "minLength": 1},
+        "body": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["label", "url"],
+            "additionalProperties": false,
+            "properties": {
+              "label": {"type": "string", "minLength": 1},
+              "url": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "eyebrow", "description", "kind", "items"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "title": {"type": "string", "minLength": 1},
+          "eyebrow": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["interactive", "static"]},
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "title", "description", "status", "url", "video"],
+              "additionalProperties": false,
+              "properties": {
+                "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+                "title": {"type": "string", "minLength": 1},
+                "description": {"type": "string", "minLength": 1},
+                "status": {"enum": ["building", "available"]},
+                "url": {"type": "string", "minLength": 1},
+                "video": {
+                  "type": "object",
+                  "required": ["status", "label"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {"enum": ["planned", "available"]},
+                    "label": {"type": "string", "minLength": 1},
+                    "url": {"type": "string", "minLength": 1}
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {"status": {"const": "available"}},
+                        "required": ["status"]
+                      },
+                      "then": {"required": ["url"]}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

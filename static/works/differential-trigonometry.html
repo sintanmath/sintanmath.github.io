@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>地阶残卷·微分三角篇</title>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root {
+      --night: #07110f;
+      --deep-green: #10241d;
+      --jade: #6ca98e;
+      --jade-light: #b6d8c5;
+      --paper: #e8dec3;
+      --ink: #24271f;
+      --ink-soft: #4e5346;
+      --gold: #c7a65d;
+      --red: #9a3127;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 50% 10%, rgba(102, 165, 134, 0.18), transparent 34%),
+        linear-gradient(160deg, #030908 0%, var(--night) 45%, #0d1a16 100%);
+      font-family:
+        "STKaiti", "KaiTi", "Kaiti SC", "Songti SC",
+        "Noto Serif SC", serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.55;
+      background-image:
+        radial-gradient(circle, rgba(234, 214, 154, 0.8) 0 1px, transparent 1.6px),
+        radial-gradient(circle, rgba(182, 216, 197, 0.5) 0 1px, transparent 1.8px);
+      background-size: 110px 110px, 170px 170px;
+      background-position: 20px 30px, 80px 10px;
+      animation: starDrift 28s linear infinite;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      left: -20%;
+      right: -20%;
+      bottom: -220px;
+      height: 520px;
+      pointer-events: none;
+      opacity: 0.8;
+      filter: blur(22px);
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(187, 215, 200, 0.18), transparent 52%),
+        radial-gradient(ellipse at 52% 45%, rgba(131, 179, 155, 0.16), transparent 50%),
+        radial-gradient(ellipse at 78% 55%, rgba(209, 226, 216, 0.15), transparent 55%);
+      animation: mistFlow 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes starDrift {
+      from { background-position: 20px 30px, 80px 10px; }
+      to { background-position: 130px 140px, -90px 180px; }
+    }
+
+    @keyframes mistFlow {
+      from { transform: translateX(-3%) scale(1); }
+      to { transform: translateX(4%) scale(1.08); }
+    }
+
+    @keyframes floatSeal {
+      0%, 100% { transform: rotate(-8deg) translateY(0); }
+      50% { transform: rotate(-6deg) translateY(-5px); }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.58; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.05); }
+    }
+
+    .page-shell {
+      position: relative;
+      width: min(1080px, calc(100% - 32px));
+      margin: 58px auto;
+      padding: 18px;
+    }
+
+    .halo {
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+      border: 1px solid rgba(199, 166, 93, 0.22);
+      border-radius: 50%;
+    }
+
+    .halo-one {
+      width: 540px;
+      height: 540px;
+      top: -140px;
+      right: -190px;
+      animation: glowPulse 8s ease-in-out infinite;
+    }
+
+    .halo-two {
+      width: 340px;
+      height: 340px;
+      left: -160px;
+      bottom: 220px;
+      animation: glowPulse 11s ease-in-out infinite reverse;
+    }
+
+    .scroll {
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+      padding: 72px clamp(26px, 7vw, 88px) 82px;
+      border: 1px solid rgba(97, 78, 38, 0.48);
+      border-radius: 5px;
+      background:
+        linear-gradient(rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+        repeating-linear-gradient(0deg, transparent 0, transparent 27px, rgba(85,70,43,0.025) 28px),
+        radial-gradient(circle at 12% 10%, rgba(255,255,255,0.28), transparent 25%),
+        radial-gradient(circle at 86% 90%, rgba(111,85,35,0.1), transparent 28%),
+        var(--paper);
+      box-shadow:
+        0 30px 90px rgba(0,0,0,0.52),
+        inset 0 0 70px rgba(71,52,23,0.17),
+        inset 0 0 0 8px rgba(255,249,224,0.14);
+    }
+
+    .scroll::before,
+    .scroll::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 18px;
+      opacity: 0.55;
+      background: linear-gradient(90deg, rgba(63,44,20,0.18), transparent);
+    }
+
+    .scroll::before { left: 0; }
+    .scroll::after { right: 0; transform: scaleX(-1); }
+
+    .top-ornament,
+    .bottom-ornament {
+      position: absolute;
+      left: 50%;
+      width: 78%;
+      height: 1px;
+      transform: translateX(-50%);
+      background:
+        linear-gradient(90deg, transparent, rgba(123,91,35,0.5),
+        var(--gold), rgba(123,91,35,0.5), transparent);
+    }
+
+    .top-ornament { top: 32px; }
+    .bottom-ornament { bottom: 34px; }
+
+    .top-ornament::before,
+    .bottom-ornament::before {
+      content: "◇";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      padding: 0 14px;
+      color: #8e7137;
+      background: var(--paper);
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+    }
+
+    .document-header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .rank {
+      margin: 0 0 10px;
+      color: #765d2c;
+      font-size: 15px;
+      letter-spacing: 0.55em;
+    }
+
+    h1 {
+      margin: 0;
+      color: #26372e;
+      font-size: clamp(38px, 6vw, 64px);
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.7),
+        0 0 18px rgba(78,119,97,0.13);
+    }
+
+    .subtitle {
+      margin: 14px 0 0;
+      color: #7e6333;
+      font-size: 14px;
+      letter-spacing: 0.35em;
+    }
+
+    .seal {
+      position: absolute;
+      top: 8px;
+      right: 2%;
+      display: grid;
+      width: 72px;
+      height: 72px;
+      place-items: center;
+      border: 3px double rgba(130,34,27,0.8);
+      color: rgba(135,38,30,0.87);
+      background: rgba(150,46,36,0.05);
+      font-size: 18px;
+      line-height: 1.1;
+      writing-mode: vertical-rl;
+      box-shadow: inset 0 0 8px rgba(130,34,27,0.12);
+      animation: floatSeal 5s ease-in-out infinite;
+    }
+
+    .opening {
+      position: relative;
+      margin: 0 auto 46px;
+      padding: 26px 24px;
+      border-top: 1px solid rgba(114,87,40,0.32);
+      border-bottom: 1px solid rgba(114,87,40,0.32);
+      color: #38483e;
+      text-align: center;
+      font-size: clamp(18px, 2.4vw, 23px);
+      line-height: 2;
+      letter-spacing: 0.08em;
+    }
+
+    .opening::before {
+      content: "气";
+      position: absolute;
+      top: -26px;
+      left: 12px;
+      color: rgba(74,108,89,0.09);
+      font-size: 112px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .chapter {
+      position: relative;
+      margin: 44px 0;
+      padding: 4px 0 0 22px;
+      border-left: 2px solid rgba(152,115,46,0.45);
+    }
+
+    .chapter h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 18px;
+      color: #31483b;
+      font-size: clamp(24px, 3.2vw, 34px);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+
+    .chapter h2::before {
+      content: "";
+      width: 27px;
+      height: 1px;
+      background: var(--gold);
+      box-shadow: 0 0 8px rgba(199,166,93,0.6);
+    }
+
+    .chapter p,
+    .chapter li {
+      color: var(--ink-soft);
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    .chapter p { margin: 12px 0; }
+
+    .formula {
+      position: relative;
+      margin: 20px auto;
+      padding: 18px 20px;
+      overflow-x: auto;
+      border: 1px solid rgba(127,101,50,0.27);
+      border-radius: 4px;
+      color: #1f342a;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.32), rgba(218,226,209,0.14));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.55),
+        0 8px 24px rgba(71,59,31,0.06);
+      text-align: center;
+      font-size: 1.06rem;
+    }
+
+    .formula.core {
+      border-color: rgba(150,113,43,0.48);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(239,221,164,0.28), transparent 68%),
+        rgba(255,251,236,0.36);
+      box-shadow:
+        inset 0 0 25px rgba(204,172,98,0.11),
+        0 0 20px rgba(199,166,93,0.08);
+    }
+
+    .annotation {
+      margin: 18px 0;
+      padding: 16px 20px;
+      border-left: 3px solid rgba(92,132,108,0.58);
+      color: #3b5547;
+      background: rgba(110,158,133,0.08);
+      font-size: 16px;
+      line-height: 1.85;
+    }
+
+    .warning {
+      color: #6b3d2d;
+      border-left-color: rgba(143,48,37,0.58);
+      background: rgba(143,48,37,0.055);
+    }
+
+    .fragment {
+      position: relative;
+      margin-top: 54px;
+      padding: 30px 28px;
+      border: 1px dashed rgba(95,75,38,0.48);
+      color: #3f493f;
+      background:
+        linear-gradient(115deg, rgba(105,135,115,0.08), transparent 48%),
+        rgba(220,210,182,0.28);
+    }
+
+    .fragment-title {
+      margin: 0 0 18px;
+      color: #8b342b;
+      font-size: 21px;
+      letter-spacing: 0.18em;
+    }
+
+    .mystery {
+      margin-top: 26px;
+      color: #4d6658;
+      font-size: 18px;
+      font-style: italic;
+      line-height: 2;
+      text-align: center;
+    }
+
+    .mystery strong {
+      color: #8d3b31;
+      font-weight: 500;
+    }
+
+    .footer-mark {
+      margin-top: 48px;
+      color: rgba(80,73,54,0.7);
+      text-align: center;
+      font-size: 13px;
+      letter-spacing: 0.32em;
+    }
+
+    mjx-container { color: inherit !important; }
+    mjx-container[display="true"] { margin: 0.65em 0 !important; }
+
+    @media (max-width: 720px) {
+      .page-shell {
+        width: min(100% - 12px, 1080px);
+        margin: 12px auto;
+        padding: 0;
+      }
+
+      .scroll { padding: 58px 20px 68px; }
+
+      .seal {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin: 22px auto 0;
+      }
+
+      .chapter { padding-left: 14px; }
+
+      .formula {
+        padding: 16px 10px;
+        font-size: 0.92rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page-shell">
+    <div class="halo halo-one"></div>
+    <div class="halo halo-two"></div>
+
+    <article class="scroll">
+      <div class="top-ornament"></div>
+
+      <header class="document-header">
+        <p class="rank">地 阶 功 法 · 残 页</p>
+        <h1>微分三角篇</h1>
+        <p class="subtitle">观三边之动 · 察万象之变</p>
+        <div class="seal" aria-label="残卷印章">残卷</div>
+      </header>
+
+      <section class="opening">
+        凡三角之形，定于三边。<br />
+        三边既动，则角、面积、圆、高，皆随之而变。<br />
+        人阶弟子背其形，地阶修士察其变。
+      </section>
+
+      <section class="chapter">
+        <h2>总纲·三边化万象</h2>
+        <p>
+          设三角形三边为 \(a,b,c\)，其对角为 \(A,B,C\)，面积为
+          \(S\)，外接圆半径为 \(R\)。
+        </p>
+        <p>三边既定，三角形的内禀几何量皆可视作三元函数。</p>
+        <div class="formula">
+          \[
+          F=F(a,b,c)
+          \]
+        </div>
+        <div class="annotation">
+          地阶之法，不再将面积、角度与圆半径视为静止之数，
+          而将其视作随三边流转的几何函数。
+        </div>
+      </section>
+
+      <section class="chapter">
+        <h2>第一式·面积感应</h2>
+        <p>固定 \(b,c\)，只令对边 \(a\) 微动，则面积之变化率为：</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          \frac{\partial S}{\partial a}=R\cos A
+          }
+          \]
+        </div>
+        <p>循环轮转可得：</p>
+        <div class="formula">
+          \[
+          \frac{\partial S}{\partial b}=R\cos B,
+          \qquad
+          \frac{\partial S}{\partial c}=R\cos C
+          \]
+        </div>
+        <p>故三边同时微动时：</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          dS
+          =
+          R\cos A\,da
+          +
+          R\cos B\,db
+          +
+          R\cos C\,dc
+          }
+          \]
+        </div>
+        <div class="annotation">
+          锐角之对边增长，则面积一阶增加；
+          钝角之对边增长，则面积一阶减小；
+          若对应角为直角，则面积对该边的一阶变化为零。
+        </div>
+      </section>
+
+      <section class="chapter">
+        <h2>第二式·角度感应</h2>
+        <p>固定 \(b,c\)，只令对边 \(a\) 微动，则角 \(A\) 的变化率为：</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          \frac{\partial A}{\partial a}
+          =
+          \frac{a}{2S}
+          =
+          \frac{1}{h_a}
+          }
+          \]
+        </div>
+        <p>高愈小，则角度对边长的变化愈敏感。当三角形趋近退化时，</p>
+        <div class="formula">
+          \[
+          h_a\to0
+          \]
+        </div>
+        <p>因而角度变化率趋于剧烈。</p>
+        <p>若改变邻边，则有：</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          \frac{\partial A}{\partial b}
+          =
+          -\frac{\cot C}{b}
+          }
+          \]
+        </div>
+        <div class="annotation">
+          其余诸式，不必逐一背诵。只须同时循环置换
+          \(a,b,c\) 与 \(A,B,C\)，即可自行生成。
+        </div>
+      </section>
+
+      <section class="chapter">
+        <h2>第三式·齐次天衡</h2>
+        <p>若几何量 \(F\) 满足</p>
+        <div class="formula">
+          \[
+          F(\lambda a,\lambda b,\lambda c)
+          =
+          \lambda^kF(a,b,c),
+          \]
+        </div>
+        <p>则称 \(F\) 为 \(k\) 次齐次量。其偏导必受欧拉天衡约束：</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          aF_a+bF_b+cF_c=kF
+          }
+          \]
+        </div>
+        <p>长度为一次齐次，面积为二次齐次，角度为零次齐次。</p>
+        <p>对面积施展齐次天衡：</p>
+        <div class="formula">
+          \[
+          aS_a+bS_b+cS_c=2S.
+          \]
+        </div>
+        <p>再代入面积感应式，便得：</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          a\cos A+b\cos B+c\cos C
+          =
+          \frac{2S}{R}
+          }
+          \]
+        </div>
+        <p>借正弦定理继续化形，又得纯角恒等式：</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          \sin 2A+\sin 2B+\sin 2C
+          =
+          4\sin A\sin B\sin C
+          }
+          \]
+        </div>
+        <div class="annotation">
+          一条偏导法诀，经过齐次天衡，便可自行生出三角恒等式。
+        </div>
+      </section>
+
+      <section class="chapter">
+        <h2>第四式·形变极境</h2>
+        <p>若周长固定，则允许的微小形变满足：</p>
+        <div class="formula">
+          \[
+          da+db+dc=0.
+          \]
+        </div>
+        <p>若面积抵达极值，则对一切允许形变皆有：</p>
+        <div class="formula">
+          \[
+          dS=0.
+          \]
+        </div>
+        <p>因而面积梯度必须与周长梯度同向：</p>
+        <div class="formula">
+          \[
+          S_a=S_b=S_c.
+          \]
+        </div>
+        <p>代入第一式：</p>
+        <div class="formula">
+          \[
+          \cos A=\cos B=\cos C.
+          \]
+        </div>
+        <p>于是：</p>
+        <div class="formula core">
+          \[
+          A=B=C=\frac{\pi}{3}.
+          \]
+        </div>
+        <div class="annotation">
+          固定周长之下，等边三角形面积最大。
+          人阶以海伦公式展开苦算；地阶只观其一阶变化。
+        </div>
+      </section>
+
+      <section class="fragment">
+        <h2 class="fragment-title">残卷批注</h2>
+        <p>微分之道，不在求导本身，而在以局部变化照见全局结构：</p>
+        <div class="formula">
+          \[
+          \mathrm{geometric\ quantity}
+          \longrightarrow
+          \mathrm{differential\ law}
+          \longrightarrow
+          \mathrm{identity\ or\ extremum}
+          \]
+        </div>
+        <p>一条短小的偏导法诀，往往可以生出：</p>
+        <ul>
+          <li>全微分；</li>
+          <li>齐次恒等式；</li>
+          <li>约束极值；</li>
+          <li>形状不变量；</li>
+          <li>特殊三角分支。</li>
+        </ul>
+
+        <div class="warning annotation">
+          此篇尚残。卷尾隐约可见更高层次的闭合、相容与函数依赖之术。
+        </div>
+
+        <div class="formula">
+          \[
+          F_{ab}=F_{ba}
+          \]
+        </div>
+
+        <div class="formula">
+          \[
+          \det
+          \frac{\partial(F,G,H)}
+          {\partial(a,b,c)}
+          =0
+          \]
+        </div>
+
+        <p class="mystery">
+          若三角之量皆可微，<br />
+          则诸恒等式，或非背诵所得，<br />
+          而是由<strong>形变自行显现</strong>……
+        </p>
+      </section>
+
+      <footer class="footer-mark">
+        地阶功法 · 微分三角残卷<br />
+        <a href="../index.html" style="color:inherit;text-underline-offset:.25em;">返回仙童数学主页</a>
+      </footer>
+      <div class="bottom-ornament"></div>
+    </article>
+  </main>
+</body>
+</html>

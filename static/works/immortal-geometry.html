@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>地阶残卷·仙式几何篇</title>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root {
+      --night: #07110f;
+      --paper: #e8dec3;
+      --ink: #24271f;
+      --ink-soft: #4e5346;
+      --gold: #c7a65d;
+      --red: #9a3127;
+      --jade: #6ca98e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 50% 8%, rgba(102,165,134,.18), transparent 35%),
+        linear-gradient(160deg, #030908 0%, var(--night) 48%, #0d1a16 100%);
+      font-family:
+        "STKaiti", "KaiTi", "Kaiti SC", "Songti SC",
+        "Noto Serif SC", serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .5;
+      background-image:
+        radial-gradient(circle, rgba(234,214,154,.75) 0 1px, transparent 1.6px),
+        radial-gradient(circle, rgba(182,216,197,.5) 0 1px, transparent 1.8px);
+      background-size: 110px 110px, 170px 170px;
+      background-position: 20px 30px, 80px 10px;
+      animation: stars 28s linear infinite;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      left: -20%;
+      right: -20%;
+      bottom: -230px;
+      height: 520px;
+      pointer-events: none;
+      opacity: .8;
+      filter: blur(22px);
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(187,215,200,.18), transparent 52%),
+        radial-gradient(ellipse at 52% 45%, rgba(131,179,155,.16), transparent 50%),
+        radial-gradient(ellipse at 78% 55%, rgba(209,226,216,.15), transparent 55%);
+      animation: mist 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes stars {
+      from { background-position: 20px 30px, 80px 10px; }
+      to { background-position: 130px 140px, -90px 180px; }
+    }
+
+    @keyframes mist {
+      from { transform: translateX(-3%) scale(1); }
+      to { transform: translateX(4%) scale(1.08); }
+    }
+
+    @keyframes sealFloat {
+      0%, 100% { transform: rotate(-8deg) translateY(0); }
+      50% { transform: rotate(-6deg) translateY(-5px); }
+    }
+
+    .page-shell {
+      position: relative;
+      width: min(1040px, calc(100% - 28px));
+      margin: 52px auto;
+      padding: 18px;
+    }
+
+    .halo {
+      position: absolute;
+      z-index: 0;
+      border: 1px solid rgba(199,166,93,.22);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .halo.one {
+      width: 500px;
+      height: 500px;
+      right: -180px;
+      top: -130px;
+    }
+
+    .halo.two {
+      width: 320px;
+      height: 320px;
+      left: -150px;
+      bottom: 170px;
+    }
+
+    .scroll {
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+      padding: 72px clamp(24px, 6vw, 82px) 78px;
+      border: 1px solid rgba(97,78,38,.48);
+      border-radius: 5px;
+      background:
+        linear-gradient(rgba(255,255,255,.03), rgba(255,255,255,.01)),
+        repeating-linear-gradient(0deg, transparent 0, transparent 27px, rgba(85,70,43,.025) 28px),
+        radial-gradient(circle at 12% 10%, rgba(255,255,255,.28), transparent 25%),
+        radial-gradient(circle at 86% 90%, rgba(111,85,35,.10), transparent 28%),
+        var(--paper);
+      box-shadow:
+        0 30px 90px rgba(0,0,0,.52),
+        inset 0 0 70px rgba(71,52,23,.17),
+        inset 0 0 0 8px rgba(255,249,224,.14);
+    }
+
+    .scroll::before,
+    .scroll::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 18px;
+      opacity: .55;
+      background: linear-gradient(90deg, rgba(63,44,20,.18), transparent);
+    }
+
+    .scroll::before { left: 0; }
+    .scroll::after { right: 0; transform: scaleX(-1); }
+
+    .ornament {
+      position: absolute;
+      left: 50%;
+      width: 78%;
+      height: 1px;
+      transform: translateX(-50%);
+      background:
+        linear-gradient(90deg, transparent, rgba(123,91,35,.5),
+        var(--gold), rgba(123,91,35,.5), transparent);
+    }
+
+    .ornament.top { top: 32px; }
+    .ornament.bottom { bottom: 34px; }
+
+    .ornament::before {
+      content: "◇";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      padding: 0 14px;
+      color: #8e7137;
+      background: var(--paper);
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+    }
+
+    header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 42px;
+    }
+
+    .rank {
+      margin: 0 0 10px;
+      color: #765d2c;
+      font-size: 15px;
+      letter-spacing: .55em;
+    }
+
+    h1 {
+      margin: 0;
+      color: #26372e;
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-shadow: 0 1px 0 rgba(255,255,255,.7);
+    }
+
+    .subtitle {
+      margin: 14px 0 0;
+      color: #7e6333;
+      font-size: 14px;
+      letter-spacing: .32em;
+    }
+
+    .seal {
+      position: absolute;
+      top: 6px;
+      right: 2%;
+      display: grid;
+      width: 72px;
+      height: 72px;
+      place-items: center;
+      border: 3px double rgba(130,34,27,.8);
+      color: rgba(135,38,30,.87);
+      background: rgba(150,46,36,.05);
+      font-size: 18px;
+      line-height: 1.1;
+      writing-mode: vertical-rl;
+      animation: sealFloat 5s ease-in-out infinite;
+    }
+
+    .opening {
+      margin: 0 auto 42px;
+      padding: 24px 20px;
+      border-top: 1px solid rgba(114,87,40,.32);
+      border-bottom: 1px solid rgba(114,87,40,.32);
+      color: #38483e;
+      text-align: center;
+      font-size: clamp(18px, 2.3vw, 22px);
+      line-height: 2;
+      letter-spacing: .08em;
+    }
+
+    .chapter {
+      margin: 40px 0;
+      padding-left: 20px;
+      border-left: 2px solid rgba(152,115,46,.45);
+    }
+
+    .chapter h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 16px;
+      color: #31483b;
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 500;
+      letter-spacing: .08em;
+    }
+
+    .chapter h2::before {
+      content: "";
+      width: 26px;
+      height: 1px;
+      background: var(--gold);
+      box-shadow: 0 0 8px rgba(199,166,93,.6);
+    }
+
+    .chapter p {
+      margin: 10px 0;
+      color: var(--ink-soft);
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    .formula {
+      margin: 18px auto;
+      padding: 17px 18px;
+      overflow-x: auto;
+      border: 1px solid rgba(127,101,50,.27);
+      border-radius: 4px;
+      color: #1f342a;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.32), rgba(218,226,209,.14));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.55),
+        0 8px 24px rgba(71,59,31,.06);
+      text-align: center;
+      font-size: 1.05rem;
+    }
+
+    .formula.core {
+      border-color: rgba(150,113,43,.48);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(239,221,164,.28), transparent 68%),
+        rgba(255,251,236,.36);
+    }
+
+    .annotation {
+      margin: 16px 0;
+      padding: 15px 18px;
+      border-left: 3px solid rgba(92,132,108,.58);
+      color: #3b5547;
+      background: rgba(110,158,133,.08);
+      font-size: 16px;
+      line-height: 1.85;
+    }
+
+    .fragment {
+      margin-top: 50px;
+      padding: 28px 26px;
+      border: 1px dashed rgba(95,75,38,.48);
+      color: #3f493f;
+      background:
+        linear-gradient(115deg, rgba(105,135,115,.08), transparent 48%),
+        rgba(220,210,182,.28);
+    }
+
+    .fragment h2 {
+      margin: 0 0 16px;
+      color: #8b342b;
+      font-size: 21px;
+      letter-spacing: .18em;
+    }
+
+    .fragment p {
+      color: #4d6658;
+      font-size: 18px;
+      line-height: 2;
+      text-align: center;
+    }
+
+    .footer {
+      margin-top: 46px;
+      color: rgba(80,73,54,.7);
+      text-align: center;
+      font-size: 13px;
+      letter-spacing: .32em;
+    }
+
+    mjx-container { color: inherit !important; }
+    mjx-container[display="true"] { margin: .65em 0 !important; }
+
+    @media (max-width: 720px) {
+      .page-shell {
+        width: min(100% - 12px, 1040px);
+        margin: 12px auto;
+        padding: 0;
+      }
+
+      .scroll { padding: 58px 20px 68px; }
+
+      .seal {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin: 22px auto 0;
+      }
+
+      .chapter { padding-left: 14px; }
+
+      .formula {
+        padding: 15px 10px;
+        font-size: .92rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page-shell">
+    <div class="halo one"></div>
+    <div class="halo two"></div>
+
+    <article class="scroll">
+      <div class="ornament top"></div>
+
+      <header>
+        <p class="rank">地 阶 功 法 · 残 页</p>
+        <h1>仙式几何篇</h1>
+        <p class="subtitle">忘旧尺 · 观新法</p>
+        <div class="seal">残卷</div>
+      </header>
+
+      <section class="opening">
+        线段皆有长度，二线相交皆有角度。<br />
+        然长度如何相加，取决于方向；<br />
+        角度如何相合，也未必出于求和。
+      </section>
+
+      <section class="chapter">
+        <h2>第一式·垂直求和</h2>
+        <p>若三角形 \(ABC\) 在 \(B\) 点垂直，则</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          AC=AB+BC
+          }
+          \]
+        </div>
+        <div class="annotation">
+          长度只在垂直方向上直接相加。
+        </div>
+      </section>
+
+      <section class="chapter">
+        <h2>第二式·同向转化</h2>
+        <p>若三点共线，且相邻两段长度皆为 \(1\)，则整段长度为</p>
+        <div class="formula core">
+          \[
+          \boxed{
+          4
+          }
+          \]
+        </div>
+        <div class="annotation">
+          同向长度不可直接相加，须借垂直关系转化。
+        </div>
+      </section>
+
+      <section class="chapter">
+        <h2>第三式·角度</h2>
+        <p>角度取值于 \(0\) 与 \(1\) 之间。</p>
+        <div class="formula">
+          \[
+          0\le A\le1
+          \]
+        </div>
+        <p>平行为 \(0\)，垂直为 \(1\)。角度不辨锐钝，也不沿圆周累加。</p>
+      </section>
+
+      <section class="chapter">
+        <h2>第四式·三角定律</h2>
+        <p>设三角形三边长度为 \(a,b,c\)，其相对角度为 \(A,B,C\)。</p>
+
+        <div class="formula core">
+          \[
+          \boxed{
+          \frac{A}{a}
+          =
+          \frac{B}{b}
+          =
+          \frac{C}{c}
+          }
+          \]
+        </div>
+
+        <div class="formula core">
+          \[
+          \boxed{
+          (a+b-c)^2
+          =
+          4ab(1-C)
+          }
+          \]
+        </div>
+
+        <div class="formula core">
+          \[
+          \boxed{
+          (A+B+C)^2
+          =
+          2(A^2+B^2+C^2)+4ABC
+          }
+          \]
+        </div>
+      </section>
+
+      <section class="fragment">
+        <h2>残卷批注</h2>
+        <p>
+          见数不可妄加，见角不可妄求其和。<br />
+          方向决定长度的合成，方程约束角度的关系。<br />
+          莫以旧法解释新量，先观它能生出怎样的几何。
+        </p>
+      </section>
+
+      <footer class="footer">
+        地阶功法 · 仙式几何残卷<br />
+        <a href="../index.html" style="color:inherit;text-underline-offset:.25em;">返回仙童数学主页</a>
+      </footer>
+      <div class="ornament bottom"></div>
+    </article>
+  </main>
+</body>
+</html>
