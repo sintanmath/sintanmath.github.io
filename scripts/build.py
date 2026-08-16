@@ -118,18 +118,20 @@ h1 {
 .owner { margin: 0; font-size: .9rem; color: var(--muted); }
 .bili-spotlight {
   display: flex;
-  gap: clamp(1.6rem, 5vw, 2.8rem);
+  gap: clamp(1.8rem, 6vw, 3.2rem);
   width: fit-content;
-  margin-top: 2rem;
-  padding-top: 1.15rem;
-  border-top: 1px solid var(--line);
+  margin-top: 1.8rem;
+  padding: 1.05rem 1.35rem 1.15rem;
   color: inherit;
   text-decoration: none;
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+  box-shadow: 0 22px 60px var(--shadow);
 }
 .bili-metric strong {
   display: block;
   color: var(--accent);
-  font-size: clamp(2.5rem, 8vw, 4.2rem);
+  font-size: clamp(2.8rem, 9vw, 4.6rem);
   font-weight: 600;
   letter-spacing: -.07em;
   line-height: .92;

@@ -8,6 +8,7 @@ import hashlib
 import hmac
 import http.cookiejar
 import json
+import os
 import sys
 import time
 import urllib.error
@@ -70,6 +71,7 @@ class BiliClient:
         self.jar = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
         self.ticket = ""
+        self.sessdata = os.environ.get("BILI_SESSDATA", "").strip()
         self._prepare_session()
 
     def _prepare_session(self) -> None:
@@ -107,6 +109,8 @@ class BiliClient:
         cookies = [f"{cookie.name}={cookie.value}" for cookie in self.jar]
         if self.ticket:
             cookies.append(f"bili_ticket={self.ticket}")
+        if self.sessdata:
+            cookies.append(f"SESSDATA={self.sessdata}")
         if cookies:
             headers["Cookie"] = "; ".join(cookies)
         request = urllib.request.Request(
@@ -212,11 +216,20 @@ def fetch_stats(mid: int, space_url: str) -> dict:
     relation = client.get_json(f"https://api.bilibili.com/x/relation/stat?vmid={mid}")
     card = client.get_json(f"https://api.bilibili.com/x/web-interface/card?mid={mid}")
     follower = int(relation["follower"])
-    try:
-        play, play_videos = fetch_play_total(client)
-    except (OSError, urllib.error.URLError, TimeoutError, RuntimeError, KeyError, ValueError) as error:
-        print(f"Play total unavailable: {error}", file=sys.stderr)
-        play, play_videos = 0, 0
+    play, play_videos = 0, 0
+    if client.sessdata:
+        try:
+            upstat = client.get_json(f"https://api.bilibili.com/x/space/upstat?mid={mid}")
+            view = as_int((upstat.get("archive") or {}).get("view"))
+            if view:
+                play, play_videos = view, 10**9
+        except (OSError, urllib.error.URLError, TimeoutError, RuntimeError, KeyError, ValueError) as error:
+            print(f"upstat unavailable: {error}", file=sys.stderr)
+    if play_videos < 180:
+        try:
+            play, play_videos = fetch_play_total(client)
+        except (OSError, urllib.error.URLError, TimeoutError, RuntimeError, KeyError, ValueError) as error:
+            print(f"Play total unavailable: {error}", file=sys.stderr)
     previous = load_snapshot() or {}
     previous_play = int(previous.get("play") or 0)
     previous_videos = int(previous.get("play_videos") or 0)

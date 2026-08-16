@@ -35,6 +35,9 @@ python3 -m venv .venv
 .venv/bin/python scripts/fetch_bilibili.py
 ```
 
+官方总播放接口需要登录。若要在主页稳定显示总播放，把 B 站 Cookie 里的
+`SESSDATA` 配到仓库 Secrets 的 `BILI_SESSDATA`，不要把这串值发给任何人。
+
 构建交互应用还需要 Node.js 20 或更高版本。线上站点每天会再拉一次公开数据。
 
 然后打开 `http://localhost:8000`。

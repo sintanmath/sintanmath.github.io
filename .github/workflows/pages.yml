@@ -32,6 +32,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Validate and build
+        env:
+          BILI_SESSDATA: ${{ secrets.BILI_SESSDATA }}
         run: |
           python scripts/validate.py
           python scripts/build.py
