@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EML 单算子常数构造器</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+    crossorigin="anonymous"
+  />
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
+    crossorigin="anonymous"
+  ></script>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="home-nav"><a href="/">← 返回仙童数学主页</a></p>
+      <h1>EML 单算子常数构造器</h1>
+      <p class="subtitle">
+        基于论文 <em>All elementary functions from a single operator</em>，
+        从常数 <code>1</code> 出发，通过 <code>eml(x,&nbsp;y)</code> 构造新常数。
+      </p>
+      <div class="formula-def" id="formulaDef"></div>
+    </header>
+
+    <section class="compute-card">
+      <div class="compute-row">
+        <span class="token func">eml</span>
+        <span class="token paren">(</span>
+        <div class="slot" id="slotX" data-slot="x" role="button" aria-label="x 槽位"></div>
+        <span class="token comma">,</span>
+        <div class="slot" id="slotY" data-slot="y" role="button" aria-label="y 槽位"></div>
+        <span class="token paren">)</span>
+        <button id="computeBtn" class="primary">运算</button>
+        <span class="token equals">=</span>
+        <div class="result" id="result"></div>
+      </div>
+      <div class="actions">
+        <button id="undoBtn" class="ghost" title="撤销 (Cmd/Ctrl + Z)">↶ 撤销</button>
+        <button id="redoBtn" class="ghost" title="重做 (Cmd/Ctrl + Shift + Z)">↷ 重做</button>
+        <span id="historyCounter" class="hint" style="min-width:86px;"></span>
+        <span class="action-divider"></span>
+        <button id="clearSlotsBtn" class="ghost">清空槽位</button>
+        <button id="resetBtn" class="ghost">重置全部</button>
+        <span class="action-divider"></span>
+        <button id="saveBtn" class="ghost" title="将历史导出为 JSON">💾 保存记录</button>
+        <label class="ghost file-label" title="从 JSON 导入并回放历史">
+          📂 导入记录
+          <input id="loadInput" type="file" accept="application/json,.json" hidden />
+        </label>
+        <a href="tests.html" class="ghost link-btn">📋 测试用例</a>
+      </div>
+      <div class="hint-row">
+        把数字拖到 <b>x</b> / <b>y</b> 槽；单击已填槽位可清除；每一步都可撤销
+      </div>
+
+      <details class="import-panel">
+        <summary>📝 粘贴 / 复制 JSON（无需下载即可存取历史）</summary>
+        <textarea id="pasteImportText" spellcheck="false" rows="5"
+          placeholder='点击"💾 保存记录"会把 JSON 填到这里方便复制；或者把备份 JSON 粘贴到这里再点"导入"。'></textarea>
+        <div class="import-actions">
+          <button id="pasteImportBtn" class="ghost">导入此 JSON</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="quick-card">
+      <details class="quick-fns" id="quickFns">
+        <summary>🛠 快捷函数（展开可使用）</summary>
+        <div id="quickList" class="qfn-list"></div>
+        <div class="hint-row">把数字拖到槽位后点"生成"即可得到新数字；同样可撤销。</div>
+      </details>
+    </section>
+
+    <section class="pool-card">
+      <div class="pool-header">
+        <h2>数字区</h2>
+        <span class="counter" id="counter"></span>
+      </div>
+      <div class="pool-wrap">
+        <div id="pool" class="pool"></div>
+      </div>
+      <div class="pool-hint">
+        提示：右键点击数字卡片（或卡片右上角的 <b>⋯</b>）可展开菜单进行化简 / 删除
+      </div>
+    </section>
+
+    <div id="contextMenu" class="context-menu" hidden role="menu" aria-label="数字操作"></div>
+
+    <footer>
+      <details>
+        <summary>化简规则（点开查看）</summary>
+        <p><strong>eml 运算自动做的基础化简：</strong></p>
+        <ul>
+          <li><code>exp(0) → 1</code>，<code>exp(1) → e</code>，<code>exp(-n) → 1/e^n</code>（n 为正整数）</li>
+          <li><code>ln(1) → 0</code>，<code>ln(e) → 1</code>，<code>ln(0) → ln&nbsp;0</code>（保留为符号，代表 −∞）</li>
+          <li><code>exp(ln&nbsp;y) → y</code>，<code>ln(exp&nbsp;x) → x</code></li>
+          <li><code>exp(ln&nbsp;0) → 0</code>，<code>exp(a − b) → e^a / e^b</code></li>
+          <li><code>ln(a / b) → ln&nbsp;a − ln&nbsp;b</code>，<code>ln(c^{1/n}) → ln&nbsp;c / n</code></li>
+          <li><code>a − 0 → a</code>，<code>a − a → 0</code>，<code>0 − a → −a</code>，<code>a − (b − c) → c</code>（当 a == b 时）</li>
+          <li>组合：<code>(p+q) − (p−q) → 2q</code>，<code>(p+q) + (p−q) → 2p</code>，<code>a + a → 2a</code></li>
+          <li>约分：<code>(a·b)/b → a</code>，<code>(a·b)/(c·b) → a/c</code> 等</li>
+        </ul>
+        <p><strong>右键菜单里的手动化简规则（不自动触发）：</strong></p>
+        <ul>
+          <li>负指数：<code>e^{-a} → 1/e^a</code></li>
+          <li>欧拉公式：<code>e^{iθ} → cos&nbsp;θ + i·sin&nbsp;θ</code></li>
+          <li>cos 偶函数：<code>cos(−a) → cos&nbsp;a</code>；sin 奇函数：<code>sin(−a) → −sin&nbsp;a</code></li>
+          <li>JSON 规则：<code>ln(−1) → π·i</code>，<code>√(−1) → i</code> 等（见 simplifications.json）</li>
+          <li><strong>深度化简</strong>：一次性把上述规则反复套到收敛为止</li>
+        </ul>
+      </details>
+    </footer>
+  </main>
+</body>
+</html>

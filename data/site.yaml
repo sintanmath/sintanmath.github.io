@@ -55,9 +55,9 @@ sections:
           label: B站视频
       - id: eml-function
         title: eml函数
-        description: 围绕 eml 函数展开的交互式探索项目。
-        status: building
-        url: apps/eml-function.html
+        description: 从常数 1 出发，用 eml(x, y) = e^x − ln y 构造新常数的交互工具。
+        status: available
+        url: apps/eml-function/
         video:
           status: planned
           label: B站视频

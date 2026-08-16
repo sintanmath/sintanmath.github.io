@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EML 极简版</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+    crossorigin="anonymous"
+  />
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
+    crossorigin="anonymous"
+  ></script>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <style>
+    main {
+      max-width: 1000px;
+      padding-top: 20px;
+    }
+    header,
+    .actions,
+    .hint-row,
+    .pool-hint,
+    footer,
+    .import-panel {
+      display: none !important;
+    }
+    .compute-card,
+    .quick-card,
+    .pool-card {
+      margin-bottom: 14px;
+      padding: 18px;
+    }
+    .compute-row {
+      justify-content: flex-start;
+      gap: 10px;
+    }
+    .pool-header {
+      margin-bottom: 10px;
+    }
+    .quick-card {
+      display: none;
+    }
+    .quick-card.is-visible {
+      display: block;
+    }
+    .quick-fns > summary {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <p class="home-nav" style="position:absolute;top:12px;left:20px;z-index:2;margin:0;">
+    <a href="/" style="color:#007aff;font-size:14px;text-decoration:none;">← 返回仙童数学主页</a>
+  </p>
+  <main>
+    <section class="compute-card">
+      <div class="formula-def" id="formulaDef"></div>
+      <div class="compute-row">
+        <span class="token func">eml</span>
+        <span class="token paren">(</span>
+        <div class="slot" id="slotX" data-slot="x" role="button" aria-label="x 槽位"></div>
+        <span class="token comma">,</span>
+        <div class="slot" id="slotY" data-slot="y" role="button" aria-label="y 槽位"></div>
+        <span class="token paren">)</span>
+        <button id="computeBtn" class="primary">运算</button>
+        <span class="token equals">=</span>
+        <div class="result" id="result"></div>
+      </div>
+    </section>
+
+    <section class="quick-card" id="quickCard" aria-hidden="true">
+      <details class="quick-fns" id="quickFns" open>
+        <summary>快捷函数</summary>
+        <div id="quickList" class="qfn-list"></div>
+      </details>
+    </section>
+
+    <section class="pool-card">
+      <div class="pool-header">
+        <h2>数字区</h2>
+        <span class="counter" id="counter"></span>
+      </div>
+      <div class="pool-wrap">
+        <div id="pool" class="pool"></div>
+      </div>
+    </section>
+
+    <div id="contextMenu" class="context-menu" hidden role="menu" aria-label="数字操作"></div>
+  </main>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const quickCard = document.getElementById('quickCard');
+      if (!quickCard) return;
+      const toggleQuick = () => {
+        const visible = quickCard.classList.toggle('is-visible');
+        quickCard.setAttribute('aria-hidden', String(!visible));
+      };
+      window.addEventListener('keydown', (e) => {
+        const tag = (e.target && e.target.tagName) || '';
+        const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable);
+        if (inInput) return;
+        if (e.key === 'q' || e.key === 'Q') {
+          e.preventDefault();
+          toggleQuick();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

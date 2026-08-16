@@ -17,6 +17,7 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("交互数学内容", homepage)
         self.assertIn("数学功法", homepage)
         self.assertIn("点 · 线 · 结构", homepage)
+        self.assertIn("eml函数", homepage)
         self.assertIn("teorth.github.io/tao-web", homepage)
 
     def test_pages_artifact_disables_jekyll(self) -> None:
@@ -25,7 +26,6 @@ class GeneratedSiteTests(unittest.TestCase):
     def test_building_placeholder_pages_exist(self) -> None:
         expected = [
             "apps/infinite-sum-game.html",
-            "apps/eml-function.html",
             "works/trigonometry-human.html",
         ]
         for relative_path in expected:
@@ -33,6 +33,16 @@ class GeneratedSiteTests(unittest.TestCase):
                 page = SITE / relative_path
                 self.assertTrue(page.exists())
                 self.assertIn("制作中", page.read_text(encoding="utf-8"))
+
+    def test_eml_function_app_is_published(self) -> None:
+        page = SITE / "apps" / "eml-function" / "index.html"
+        self.assertTrue(page.exists())
+        content = page.read_text(encoding="utf-8")
+        self.assertIn("EML 单算子常数构造器", content)
+        self.assertIn("返回仙童数学主页", content)
+        self.assertNotIn("<strong>制作中</strong>", content)
+        self.assertTrue((page.parent / "app.js").exists())
+        self.assertTrue((page.parent / "simplifications.json").exists())
 
     def test_workbench_app_is_published(self) -> None:
         page = SITE / "apps" / "geometric-discovery-workbench" / "index.html"

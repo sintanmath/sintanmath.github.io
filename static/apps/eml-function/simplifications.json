@@ -1,0 +1,34 @@
+{
+  "app": "eml-constants",
+  "description": "数字右键菜单的化简规则。当池子里的某个数字在结构上精确等于一条规则的 from 时，右键就会出现'化简为 to'；点击后 to 作为新数字加入池子（不动原数字）。",
+  "expressionSchema": "与 tests.json 相同；额外支持的原子: { type: 'pi' } 表示 π, { type: 'i' } 表示虚数单位 i；{ type: 'mul', a, b } 表示乘法。",
+  "rules": [
+    {
+      "name": "ln(-1) = π i",
+      "rationale": "欧拉恒等式 e^{iπ} = -1 的对数形式",
+      "from": {
+        "type": "ln",
+        "x": { "type": "num", "value": -1 }
+      },
+      "to": {
+        "type": "mul",
+        "a": { "type": "pi" },
+        "b": { "type": "i" }
+      }
+    },
+    {
+      "name": "√(-1) = i",
+      "rationale": "虚数单位的定义",
+      "from": {
+        "type": "pow",
+        "a": { "type": "num", "value": -1 },
+        "b": {
+          "type": "div",
+          "a": { "type": "num", "value": 1 },
+          "b": { "type": "num", "value": 2 }
+        }
+      },
+      "to": { "type": "i" }
+    }
+  ]
+}

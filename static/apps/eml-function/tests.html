@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EML 测试结果</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+    crossorigin="anonymous"
+  />
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
+    crossorigin="anonymous"
+  ></script>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="tests.js"></script>
+  <style>
+    .test-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 24px 60px;
+    }
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      border-radius: 14px;
+      padding: 20px 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    .summary .num { font-size: 32px; font-weight: 600; }
+    .summary .pass { color: var(--success); }
+    .summary .fail { color: #ff3b30; }
+    .back-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .back-link:hover { text-decoration: underline; }
+    table.results {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    table.results thead th {
+      background: #f0f0f3;
+      text-align: left;
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 14px;
+      border-bottom: 1px solid #e5e5ea;
+    }
+    table.results tbody td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f0f0f3;
+      vertical-align: top;
+    }
+    table.results tbody tr:last-child td { border-bottom: none; }
+    table.results tbody tr.pass-row td.status { color: var(--success); font-weight: 600; }
+    table.results tbody tr.fail-row { background: #fff5f5; }
+    table.results tbody tr.fail-row td.status { color: #ff3b30; font-weight: 600; }
+    .num-col { width: 40px; color: var(--muted); }
+    .name-col { min-width: 240px; }
+    .name-col .title { font-weight: 500; margin-bottom: 4px; }
+    .name-col .why {
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .latex-cell {
+      font-size: 18px;
+      min-width: 140px;
+    }
+    .latex-cell.fail-cell { color: #ff3b30; }
+    .status { text-align: center; font-size: 20px; width: 60px; }
+    .diff {
+      color: #ff3b30;
+      font-family: Menlo, monospace;
+      font-size: 11px;
+      margin-top: 4px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-main">
+    <div class="summary" id="summary">
+      <div>
+        <div class="num" id="numBox">加载中...</div>
+        <div style="color: var(--muted); font-size: 14px; margin-top: 4px;">
+          测试来源：<code>tests.json</code>
+        </div>
+      </div>
+      <div>
+        <a href="/" class="back-link">← 返回仙童数学主页</a>
+        <span style="color: var(--muted); margin: 0 8px;">·</span>
+        <a href="index.html" class="back-link">返回构造器</a>
+      </div>
+    </div>
+
+    <table class="results">
+      <thead>
+        <tr>
+          <th class="num-col">#</th>
+          <th class="name-col">用例</th>
+          <th class="latex-cell">期望</th>
+          <th class="latex-cell">实际</th>
+          <th class="status">状态</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</body>
+</html>
