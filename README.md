@@ -48,10 +48,10 @@ python3 -m venv .venv
 
 - 完善个人介绍和链接；
 - 项目完成后，将对应条目的 `status` 改成 `available`；
-- 将 `url` 指向项目入口 HTML 或 PDF。
+- 将 `url` 指向项目入口 HTML、PDF，或网盘分享链接。
 - 添加视频时，将项目的 `video.status` 改成 `available`，并填写 B 站
   `video.url`；未填写时主页会显示“视频待补充”。
-- 配套课件若放在网盘，填写 `resource.label` 和 `resource.url`，不要把课件文件提交进仓库。
+- 配套课件若放在网盘，填写 `resource.label` 和 `resource.url`，不要把课件文件提交进仓库；条目的 `url` 也可以直接写成网盘链接，主页就不会再生成中间页。
 
 交互项目建议放在 `static/apps/<项目名>/`，需要打包的应用放在
 `apps/<项目名>/`；数学功法网页或 PDF 建议放在 `static/works/<项目名>/`。

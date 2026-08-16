@@ -424,6 +424,17 @@ def render_links(links: list[dict]) -> str:
     return f'<ul class="link-list">{items}</ul>'
 
 
+def is_external_url(url: str) -> bool:
+    return url.startswith(("http://", "https://"))
+
+
+def render_item_anchor(title: str, url: str) -> str:
+    attrs = f'href="{esc(url)}"'
+    if is_external_url(url):
+        attrs += ' target="_blank" rel="noopener noreferrer"'
+    return f"<h3><a {attrs}>{esc(title)}</a></h3>"
+
+
 def render_outbound_anchor(class_name: str, label: str, url: str) -> str:
     return (
         f'<a class="{esc(class_name)}" href="{esc(url)}" '
@@ -463,18 +474,23 @@ def render_project(item: dict, index: int) -> str:
         extra = video_html
         action_video = ""
     resource_html = render_resource(item.get("resource"))
+    extras = []
+    if extra:
+        extras.append(extra)
+    if resource_html:
+        extras.append(f'<div class="video-links">{resource_html}</div>')
+    extra_html = "".join(extras)
     return f"""
       <li class="project">
         <span class="index">{index:02d}</span>
         <div>
-          <h3><a href="{esc(item["url"])}">{esc(item["title"])}</a></h3>
+          {render_item_anchor(item["title"], item["url"])}
           <p>{esc(item["description"])}</p>
-          {extra}
+          {extra_html}
         </div>
         <div class="project-actions">
           <span class="status {esc(status)}">{label}</span>
           {action_video}
-          {resource_html}
         </div>
       </li>"""
 
@@ -588,6 +604,8 @@ def main() -> None:
 
     for section in document["sections"]:
         for item in section["items"]:
+            if is_external_url(item["url"]):
+                continue
             destination = SITE / item["url"]
             destination.parent.mkdir(parents=True, exist_ok=True)
             if item["status"] == "building":

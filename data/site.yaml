@@ -73,8 +73,8 @@ sections:
       - id: trigonometry-human
         title: 三角函数人阶篇
         description: 三角函数基础方法与思维路径的系统整理。
-        status: building
-        url: works/trigonometry-human.html
+        status: available
+        url: https://pan.quark.cn/s/c08341b3a3e8
         resource:
           label: 配套课件
           url: https://pan.quark.cn/s/c08341b3a3e8

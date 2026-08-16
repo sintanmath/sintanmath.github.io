@@ -42,13 +42,20 @@ class GeneratedSiteTests(unittest.TestCase):
     def test_building_placeholder_pages_exist(self) -> None:
         expected = [
             "apps/infinite-sum-game.html",
-            "works/trigonometry-human.html",
         ]
         for relative_path in expected:
             with self.subTest(relative_path=relative_path):
                 page = SITE / relative_path
                 self.assertTrue(page.exists())
                 self.assertIn("制作中", page.read_text(encoding="utf-8"))
+
+    def test_trigonometry_courseware_opens_quark_share(self) -> None:
+        quark_url = "https://pan.quark.cn/s/c08341b3a3e8"
+        homepage = (SITE / "index.html").read_text(encoding="utf-8")
+        self.assertIn("配套课件", homepage)
+        self.assertIn(quark_url, homepage)
+        self.assertIn(f'href="{quark_url}"', homepage)
+        self.assertFalse((SITE / "works" / "trigonometry-human.html").exists())
 
     def test_eml_function_app_is_published(self) -> None:
         page = SITE / "apps" / "eml-function" / "index.html"
@@ -79,17 +86,6 @@ class GeneratedSiteTests(unittest.TestCase):
                 self.assertIn(title, content)
                 self.assertNotIn("<strong>制作中</strong>", content)
                 self.assertIn("返回仙童数学主页", content)
-
-    def test_trigonometry_courseware_opens_quark_share(self) -> None:
-        quark_url = "https://pan.quark.cn/s/c08341b3a3e8"
-        homepage = (SITE / "index.html").read_text(encoding="utf-8")
-        placeholder = (SITE / "works" / "trigonometry-human.html").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("配套课件", homepage)
-        self.assertIn(quark_url, homepage)
-        self.assertIn(quark_url, placeholder)
-        self.assertIn('target="_blank"', homepage)
 
     def test_every_project_has_a_video_slot(self) -> None:
         homepage = (SITE / "index.html").read_text(encoding="utf-8")
