@@ -116,6 +116,40 @@ h1 {
   font-size: 1.15rem;
 }
 .owner { margin: 0; font-size: .9rem; color: var(--muted); }
+.bili-spotlight {
+  display: flex;
+  gap: clamp(1.6rem, 5vw, 2.8rem);
+  width: fit-content;
+  margin-top: 2rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+.bili-metric strong {
+  display: block;
+  color: var(--accent);
+  font-size: clamp(2.5rem, 8vw, 4.2rem);
+  font-weight: 600;
+  letter-spacing: -.07em;
+  line-height: .92;
+}
+.bili-metric strong small {
+  margin-left: .12em;
+  font-size: .38em;
+  letter-spacing: .08em;
+}
+.bili-metric em {
+  display: block;
+  margin-top: .48rem;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: .72rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: .22em;
+}
+.bili-spotlight:hover .bili-metric strong { color: var(--accent-deep); }
 .intro {
   display: grid;
   grid-template-columns: 11rem 1fr;
@@ -131,13 +165,6 @@ h1 {
 .intro-copy p:first-child { margin-top: 0; }
 .intro-copy p:last-child { margin-bottom: 0; }
 .link-list { display: flex; flex-wrap: wrap; gap: .45rem 1rem; padding: 0; list-style: none; }
-.bili-stats {
-  margin: .9rem 0 0;
-  color: var(--muted);
-  font-size: .9rem;
-}
-.bili-stats a { color: inherit; text-decoration: none; }
-.bili-stats a:hover { color: var(--accent); }
 .content-section { padding: 3.4rem 0 .4rem; }
 .section-head {
   display: grid;
@@ -310,25 +337,42 @@ def load_bilibili() -> dict | None:
     return document
 
 
+def render_metric(label: str, value: object, fallback: object | None = None) -> str:
+    text = str(value or fallback or "")
+    if not text:
+        return ""
+    if " " in text:
+        number, unit = text.rsplit(" ", 1)
+        number_html = f"{esc(number)}<small>{esc(unit)}</small>"
+    else:
+        number_html = esc(text)
+    return (
+        f'<span class="bili-metric">'
+        f"<strong>{number_html}</strong>"
+        f"<em>{esc(label)}</em>"
+        f"</span>"
+    )
+
+
 def render_bilibili(stats: dict | None) -> str:
     if not stats:
         return ""
-    follower = stats.get("follower_label") or str(stats["follower"])
-    video = stats.get("video")
-    extra = f" · {video} 个视频" if video else ""
+    follower = render_metric("粉丝", stats.get("follower_label"), stats.get("follower"))
+    play = render_metric("总播放", stats.get("play_label"), None)
+    if not follower:
+        return ""
     fetched = stats.get("fetched_at", "")
     title = f' title="更新于 {esc(fetched[:10])}"' if fetched else ""
     return (
-        f'<p class="bili-stats">'
-        f'<a href="{esc(stats["space_url"])}"{title}>'
-        f'B站 {esc(follower)}粉丝{esc(extra)}</a></p>'
+        f'<a class="bili-spotlight" href="{esc(stats["space_url"])}"{title}>'
+        f"{follower}{play}</a>"
     )
 
 
 def refresh_bilibili_snapshot() -> None:
     script = ROOT / "scripts" / "fetch_bilibili.py"
     try:
-        subprocess.run([sys.executable, str(script)], check=True, timeout=30)
+        subprocess.run([sys.executable, str(script)], check=True, timeout=90)
     except (OSError, subprocess.SubprocessError):
         pass
 
@@ -418,6 +462,7 @@ def build_home(document: dict) -> str:
       <h1>{esc(site["title"])}</h1>
       <p class="tagline">{esc(site["tagline"])}</p>
       <p class="owner">{esc(site["owner"])}</p>
+      {render_bilibili(load_bilibili())}
     </div>
   </header>
   <main class="wrap">
@@ -426,7 +471,6 @@ def build_home(document: dict) -> str:
       <div class="intro-copy">
         {profile_body}
         {render_links(profile["links"])}
-        {render_bilibili(load_bilibili())}
       </div>
     </section>
     {"".join(sections)}

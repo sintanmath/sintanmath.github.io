@@ -29,7 +29,7 @@ python3 -m venv .venv
 .venv/bin/python -m http.server 8000 -d site
 ```
 
-构建时会尝试刷新 B 站粉丝数；也可以单独运行：
+构建时会尝试刷新 B 站粉丝数和总播放量；也可以单独运行：
 
 ```bash
 .venv/bin/python scripts/fetch_bilibili.py

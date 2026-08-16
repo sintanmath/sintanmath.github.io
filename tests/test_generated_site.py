@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 from pathlib import Path
 
@@ -19,8 +20,13 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("点 · 线 · 结构", homepage)
         self.assertIn("eml函数", homepage)
         self.assertIn("teorth.github.io/tao-web", homepage)
+        self.assertIn("bili-spotlight", homepage)
         self.assertIn("粉丝", homepage)
         self.assertIn("space.bilibili.com/490068376", homepage)
+        self.assertNotIn("个视频", homepage)
+        snapshot = json.loads((ROOT / "data" / "bilibili.json").read_text(encoding="utf-8"))
+        if snapshot.get("play"):
+            self.assertIn("总播放", homepage)
 
     def test_pages_artifact_disables_jekyll(self) -> None:
         self.assertTrue((SITE / ".nojekyll").exists())

@@ -18,6 +18,9 @@ class FetchBilibiliTests(unittest.TestCase):
         self.assertEqual(fetch_bilibili.format_zh_count(10000), "1 万")
         self.assertEqual(fetch_bilibili.format_zh_count(211297), "21.1 万")
         self.assertEqual(fetch_bilibili.format_zh_count(1_000_000), "100 万")
+        self.assertEqual(fetch_bilibili.format_zh_count(19_268_398), "1927 万")
+        self.assertEqual(fetch_bilibili.format_zh_count(100_000_000), "1 亿")
+        self.assertEqual(fetch_bilibili.format_zh_parts(211297), ("21.1", "万"))
 
     def test_config_points_to_xian_tong_math(self) -> None:
         config = fetch_bilibili.load_config()
