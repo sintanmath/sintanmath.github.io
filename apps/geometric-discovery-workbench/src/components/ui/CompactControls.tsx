@@ -14,6 +14,13 @@ import {
 } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import type { SceneDefinition } from '../../data/scenes'
+import {
+  assemblySliderIndex,
+  assemblySliderMax,
+  assemblyVisibility,
+  icosahedronAssembly,
+  snapAssemblyProgress,
+} from '../../geometry/assembly'
 import { dualSolidId } from '../../geometry/duality'
 import { platonicSolids, solidOrder } from '../../geometry/polyhedra'
 import type { StateSetter, WorkbenchState } from '../../types'
@@ -140,9 +147,14 @@ export function CompactControls({
 }) {
   const [sizesOpen, setSizesOpen] = useState(false)
   const is = (...ids: string[]) => ids.includes(scene.id)
+  const isIcosaAssembly = scene.id === 'icosa-assembly'
+  const icosaParts = icosahedronAssembly.parts
+  const icosaVisibility = isIcosaAssembly
+    ? assemblyVisibility(icosaParts, state.assembly)
+    : null
   const hasFaces = is('platonic-atlas', 'skeleton', 'duality', 'icosa-assembly', 'zometool-node')
   const hasAssembly = is('duality', 'orthogonal-node', 'cube-lattice', 'icosa-vertex', 'icosa-assembly', 'direction-node', 'zometool-node')
-  const hasExplode = is('platonic-atlas', 'skeleton', 'cube-lattice', 'icosa-assembly')
+  const hasExplode = is('platonic-atlas', 'skeleton', 'cube-lattice')
   const hasPorts = !is('platonic-atlas', 'duality')
   const hasGuides = is('orthogonal-node', 'icosa-vertex', 'icosa-assembly', 'direction-node', 'zometool-node')
   const hasFamilies = is('direction-node', 'zometool-node')
@@ -236,12 +248,27 @@ export function CompactControls({
         <div className="motion-dock">
           {hasAssembly && (
             <MiniRange
-              label={scene.id === 'orthogonal-node' ? '插杆深度' : scene.id === 'duality' ? '对偶变换' : '搭建进度'}
-              value={state.assembly}
-              onChange={(value) => setState('assembly', value)}
+              label={scene.id === 'orthogonal-node' ? '插杆深度' : scene.id === 'duality' ? '对偶变换' : scene.id === 'direction-node' ? '杆件长度' : '搭建进度'}
+              value={isIcosaAssembly ? assemblySliderIndex(state.assembly, icosaParts.length) : state.assembly}
+              min={0}
+              max={isIcosaAssembly ? assemblySliderMax(icosaParts.length) : 1}
+              step={isIcosaAssembly ? 1 : 0.01}
+              onChange={(value) => setState(
+                'assembly',
+                isIcosaAssembly ? snapAssemblyProgress(
+                  assemblySliderMax(icosaParts.length) === 0
+                    ? 1
+                    : value / assemblySliderMax(icosaParts.length),
+                  icosaParts.length,
+                ) : value,
+              )}
               icon={<Eye size={16} />}
-              percent
-              presets
+              percent={!isIcosaAssembly}
+              presets={!isIcosaAssembly}
+              className={isIcosaAssembly ? 'discrete-steps' : ''}
+              formatValue={isIcosaAssembly && icosaVisibility
+                ? () => `${icosaVisibility.nodes.size}/12球 ${icosaVisibility.rods.length}/30棍`
+                : undefined}
             />
           )}
           {hasExplode && (

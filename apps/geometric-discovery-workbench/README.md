@@ -42,7 +42,7 @@ npm run preview
 | `#/scene/cube-lattice` | 用六孔节点搭建立方网格 |
 | `#/scene/icosa-vertex` | 正二十面体顶点的五个连接方向 |
 | `#/scene/icosa-assembly` | 十二个节点和三十根杆闭合成形 |
-| `#/scene/direction-node` | 12、20、30 三类方向叠加为 62 孔节点 |
+| `#/scene/direction-node` | 62 孔节点：伸缩杆，点击杆端生长同样的球 |
 | `#/scene/zometool-node` | 62 孔实体节点及其与正二十面体顶点、面心、棱中点的对应 |
 
 ## 操作
@@ -75,6 +75,6 @@ src/
   components/ui/      镜头目录、控制台和讲解手记
   data/               分镜标题与旁白
   geometry/           可独立测试的几何数据层
-  scenes/             八个交互场景
+  scenes/             九个交互场景
 docs/plans/           设计说明与实施计划
 ```

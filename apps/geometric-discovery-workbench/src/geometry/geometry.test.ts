@@ -1,4 +1,11 @@
 import { describe, expect, it } from 'vitest'
+import {
+  assemblyVisibility,
+  ballStickAssembly,
+  icosahedronAssembly,
+  snapAssemblyProgress,
+  visiblePartCount,
+} from './assembly'
 import { createDirectionFamilies, icosahedralVertexDirections, orthogonalDirections } from './directions'
 import {
   createDualMorph,
@@ -16,7 +23,14 @@ import {
   type PolyhedronData,
   type SolidId,
 } from './polyhedra'
-import { angleDegrees, dot, normalize, subtract, type Vec3 } from './vector'
+import { angleDegrees, distance, dot, normalize, scale, subtract, type Vec3 } from './vector'
+import {
+  countChildrenFromOrigin,
+  listBuildRods,
+  ORIGIN_NODE,
+  positionsOf,
+  spawnNode,
+} from './directionBuild'
 import {
   createZomeToolFaceFamilies,
   supportFaceEdgeTangent,
@@ -205,5 +219,157 @@ describe('physical ZomeTool node body', () => {
 
       expect(isParallelToBoundary).toBe(true)
     })
+  })
+})
+
+describe('ball-and-stick assembly', () => {
+  const { parts } = icosahedronAssembly
+
+  it('places every vertex and every edge exactly once', () => {
+    const nodes = parts.filter((part) => part.kind === 'node')
+    const rods = parts.filter((part) => part.kind === 'rod')
+    const nodeIndices = new Set(nodes.map((part) => part.vertex))
+    const rodKeys = new Set(rods.map((part) => (
+      part.start < part.end ? `${part.start}-${part.end}` : `${part.end}-${part.start}`
+    )))
+
+    expect(parts[0]).toEqual({ kind: 'node', vertex: 0 })
+    expect(nodes).toHaveLength(12)
+    expect(rods).toHaveLength(30)
+    expect(nodeIndices.size).toBe(12)
+    expect(rodKeys.size).toBe(30)
+    expect(parts).toHaveLength(42)
+  })
+
+  it('only grows from already placed pieces', () => {
+    const placedNodes = new Set<number>()
+
+    parts.forEach((part) => {
+      if (part.kind === 'node') {
+        expect(placedNodes.has(part.vertex)).toBe(false)
+        placedNodes.add(part.vertex)
+        return
+      }
+
+      expect(placedNodes.has(part.start)).toBe(true)
+    })
+
+    expect(placedNodes.size).toBe(12)
+  })
+
+  it('never inserts a floating node without a connecting rod', () => {
+    parts.forEach((part, index) => {
+      if (part.kind !== 'node' || index === 0) return
+      const previous = parts[index - 1]
+      expect(previous.kind).toBe('rod')
+      if (previous.kind === 'rod') {
+        expect(previous.end).toBe(part.vertex)
+        expect(previous.start).not.toBe(part.vertex)
+      }
+    })
+  })
+
+  it('snaps visibility to whole balls and whole rods', () => {
+    const start = assemblyVisibility(parts, 0)
+    const mid = assemblyVisibility(parts, 0.37)
+    const end = assemblyVisibility(parts, 1)
+
+    expect(start.nodes.size).toBe(1)
+    expect(start.rods).toHaveLength(0)
+    expect(start.visibleCount).toBe(1)
+    expect(end.nodes.size).toBe(12)
+    expect(end.rods).toHaveLength(30)
+    expect(end.visibleCount).toBe(42)
+    expect(visiblePartCount(parts.length, 0.37)).toBe(mid.visibleCount)
+    expect(mid.nodes.size + mid.rods.length).toBe(mid.visibleCount)
+  })
+
+  it('keeps the slider on discrete construction steps', () => {
+    expect(snapAssemblyProgress(0.371, parts.length) * (parts.length - 1))
+      .toBeCloseTo(Math.round(0.371 * (parts.length - 1)), 10)
+    expect(snapAssemblyProgress(0, parts.length)).toBe(0)
+    expect(snapAssemblyProgress(1, parts.length)).toBe(1)
+  })
+
+  it('closes every edge on the final integer tick', () => {
+    const maxIndex = parts.length - 1
+    const last = assemblyVisibility(parts, 1)
+    const almost = assemblyVisibility(parts, (maxIndex - 1) / maxIndex)
+
+    for (let index = 0; index <= maxIndex; index += 1) {
+      const visibility = assemblyVisibility(parts, index / maxIndex)
+      expect(visibility.visibleCount).toBe(index + 1)
+    }
+
+    expect(almost.nodes.size).toBe(12)
+    expect(almost.rods).toHaveLength(29)
+    expect(last.nodes.size).toBe(12)
+    expect(last.rods).toHaveLength(30)
+    expect(last.latest).toEqual({ kind: 'rod', start: 11, end: 3 })
+  })
+
+  it('also builds a connected cube from the same grammar', () => {
+    const cubeParts = ballStickAssembly(platonicSolids.cube).parts
+    const nodes = cubeParts.filter((part) => part.kind === 'node')
+    const rods = cubeParts.filter((part) => part.kind === 'rod')
+    expect(nodes).toHaveLength(8)
+    expect(rods).toHaveLength(12)
+
+    const placed = new Set<number>()
+    cubeParts.forEach((part) => {
+      if (part.kind === 'node') {
+        placed.add(part.vertex)
+        return
+      }
+      expect(placed.has(part.start)).toBe(true)
+    })
+  })
+})
+
+describe('Direction-node ball growth', () => {
+  const families = createDirectionFamilies()
+  const length = 2
+
+  it('places icosahedron vertices on the twelve five-fold rods', () => {
+    let nodes = [ORIGIN_NODE]
+    families.fiveFold.forEach((direction) => {
+      nodes = spawnNode(nodes, 0, direction, length)
+    })
+    expect(nodes).toHaveLength(13)
+    expect(countChildrenFromOrigin(nodes, families.fiveFold)).toBe(12)
+    expect(samePointSet(
+      positionsOf(nodes, length).slice(1),
+      families.fiveFold.map((direction) => scale(direction, length)),
+    )).toBe(true)
+  })
+
+  it('places dodecahedron vertices on the twenty three-fold rods', () => {
+    let nodes = [ORIGIN_NODE]
+    families.threeFold.forEach((direction) => {
+      nodes = spawnNode(nodes, 0, direction, length)
+    })
+    expect(nodes).toHaveLength(21)
+    expect(countChildrenFromOrigin(nodes, families.threeFold)).toBe(20)
+    expect(samePointSet(
+      positionsOf(nodes, length).slice(1),
+      families.threeFold.map((direction) => scale(direction, length)),
+    )).toBe(true)
+  })
+
+  it('does not duplicate a ball already sitting at the rod end', () => {
+    const once = spawnNode([ORIGIN_NODE], 0, families.fiveFold[0], length)
+    const twice = spawnNode(once, 0, families.fiveFold[0], length)
+    expect(once).toHaveLength(2)
+    expect(twice).toHaveLength(2)
+  })
+
+  it('draws an occupied rod only once after two balls are connected', () => {
+    const nodes = spawnNode([ORIGIN_NODE], 0, families.fiveFold[0], length)
+    const struts = families.fiveFold.map((direction, index) => ({
+      direction, color: '#b84e3a', family: '5', index,
+    }))
+    const rods = listBuildRods(nodes, positionsOf(nodes, length), struts, length)
+    const occupied = rods.filter((rod) => rod.occupied)
+    expect(occupied).toHaveLength(1)
   })
 })

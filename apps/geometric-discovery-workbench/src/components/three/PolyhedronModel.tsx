@@ -1,9 +1,10 @@
 import { Html } from '@react-three/drei'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js'
+import { assemblyVisibility, ballStickAssembly } from '../../geometry/assembly'
 import type { PolyhedronData } from '../../geometry/polyhedra'
-import { neighborsOf } from '../../geometry/polyhedra'
+import { neighborsOf, triangularFacesOf } from '../../geometry/polyhedra'
 import { radialScale, scale as scaleVector, subtract, normalize, type Vec3 } from '../../geometry/vector'
 import { NodeSphere } from './NodeSphere'
 import { Rod } from './Rod'
@@ -25,6 +26,7 @@ interface PolyhedronModelProps {
   edgeColor?: string
   nodeColor?: string
   highlightVertex?: number
+  snapAssembly?: boolean
 }
 
 export function PolyhedronModel({
@@ -44,6 +46,7 @@ export function PolyhedronModel({
   edgeColor = '#34474d',
   nodeColor = '#eee9da',
   highlightVertex,
+  snapAssembly = false,
 }: PolyhedronModelProps) {
   const geometry = useMemo(() => (
     new ConvexGeometry(solid.vertices.map((vertex) => new THREE.Vector3(...vertex)))
@@ -53,9 +56,54 @@ export function PolyhedronModel({
     scaleVector(radialScale(vertex, 1 + explode * 0.3), scale)
   )), [solid, explode, scale])
 
+  const visibility = useMemo(() => {
+    if (!snapAssembly) return null
+    return assemblyVisibility(ballStickAssembly(solid).parts, assembly)
+  }, [snapAssembly, solid, assembly])
+
+  const completedFaceGeometry = useMemo(() => {
+    if (!visibility) return null
+    const rodKeys = new Set(visibility.rods.map(({ start, end }) => (
+      start < end ? `${start}-${end}` : `${end}-${start}`
+    )))
+    const faces = triangularFacesOf(solid).filter(([first, second, third]) => (
+      visibility.nodes.has(first)
+      && visibility.nodes.has(second)
+      && visibility.nodes.has(third)
+      && rodKeys.has(`${Math.min(first, second)}-${Math.max(first, second)}`)
+      && rodKeys.has(`${Math.min(second, third)}-${Math.max(second, third)}`)
+      && rodKeys.has(`${Math.min(first, third)}-${Math.max(first, third)}`)
+    ))
+    if (faces.length === 0) return null
+
+    const positions: number[] = []
+    faces.forEach(([first, second, third]) => {
+      positions.push(
+        ...expandedVertices[first],
+        ...expandedVertices[second],
+        ...expandedVertices[third],
+      )
+    })
+    const faceGeometry = new THREE.BufferGeometry()
+    faceGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    faceGeometry.computeVertexNormals()
+    return faceGeometry
+  }, [expandedVertices, solid, visibility])
+
+  useEffect(() => () => {
+    completedFaceGeometry?.dispose()
+  }, [completedFaceGeometry])
+
+  const visibleEdges = visibility
+    ? visibility.rods.map(({ start, end }) => [start, end] as const)
+    : solid.edges
+  const visibleNodes = visibility
+    ? [...visibility.nodes]
+    : solid.vertices.map((_, vertexIndex) => vertexIndex)
+
   return (
     <group position={position}>
-      {showFaces && (
+      {showFaces && !visibility && (
         <mesh geometry={geometry} scale={scale * (1 + explode * 0.08)} receiveShadow castShadow>
           <meshStandardMaterial
             color={faceColor}
@@ -70,25 +118,47 @@ export function PolyhedronModel({
         </mesh>
       )}
 
-      {showEdges && solid.edges.map(([startIndex, endIndex], edgeIndex) => {
-        const edgeStart = edgeIndex / solid.edges.length
-        const localProgress = Math.min(1, Math.max(0, (assembly - edgeStart) * solid.edges.length))
+      {showFaces && completedFaceGeometry && (
+        <mesh geometry={completedFaceGeometry} receiveShadow>
+          <meshStandardMaterial
+            color={faceColor}
+            roughness={0.9}
+            transparent
+            opacity={0.28}
+            side={THREE.DoubleSide}
+            depthWrite={false}
+            polygonOffset
+            polygonOffsetFactor={1}
+          />
+        </mesh>
+      )}
+
+      {showEdges && visibleEdges.map(([startIndex, endIndex], edgeIndex) => {
+        const latestRod = visibility?.latest?.kind === 'rod'
+          && (
+            (visibility.latest.start === startIndex && visibility.latest.end === endIndex)
+            || (visibility.latest.start === endIndex && visibility.latest.end === startIndex)
+          )
         return (
           <Rod
             key={`${startIndex}-${endIndex}`}
             start={expandedVertices[startIndex]}
             end={expandedVertices[endIndex]}
-            radius={0.027 * scale * rodScale}
-            color={edgeColor}
-            progress={localProgress}
+            radius={0.027 * scale * rodScale * (latestRod ? 1.18 : 1)}
+            color={latestRod ? '#d35d43' : edgeColor}
+            progress={visibility ? 1 : Math.min(1, Math.max(0, (assembly - edgeIndex / solid.edges.length) * solid.edges.length))}
+            grow={!visibility}
             endInset={0.07 * scale * nodeScale}
           />
         )
       })}
 
-      {showNodes && solid.vertices.map((_, vertexIndex) => {
-        const appearancePoint = vertexIndex / solid.vertices.length
-        if (assembly < appearancePoint * 0.34) return null
+      {showNodes && visibleNodes.map((vertexIndex) => {
+        if (!visibility) {
+          const appearancePoint = vertexIndex / solid.vertices.length
+          if (assembly < appearancePoint * 0.34) return null
+        }
+        const latestNode = visibility?.latest?.kind === 'node' && visibility.latest.vertex === vertexIndex
         const portDirections = showPorts
           ? neighborsOf(solid, vertexIndex).map((neighborIndex) => (
             normalize(subtract(expandedVertices[neighborIndex], expandedVertices[vertexIndex]))
@@ -98,8 +168,8 @@ export function PolyhedronModel({
           <NodeSphere
             key={vertexIndex}
             position={expandedVertices[vertexIndex]}
-            radius={(highlightVertex === vertexIndex ? 0.13 : 0.095) * scale * nodeScale}
-            color={highlightVertex === vertexIndex ? '#d35d43' : nodeColor}
+            radius={(latestNode || highlightVertex === vertexIndex ? 0.13 : 0.095) * scale * nodeScale}
+            color={latestNode || highlightVertex === vertexIndex ? '#d35d43' : nodeColor}
             portDirections={portDirections}
           />
         )

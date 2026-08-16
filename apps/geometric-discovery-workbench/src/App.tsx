@@ -16,8 +16,8 @@ function initialStateFor(sceneId: SceneId): WorkbenchState {
     case 'orthogonal-node': return { ...shared, showFaces: false, assembly: 0.72 }
     case 'cube-lattice': return { ...shared, showFaces: false, assembly: 1 }
     case 'icosa-vertex': return { ...shared, showFaces: false, showLabels: true, assembly: 1 }
-    case 'icosa-assembly': return { ...shared, assembly: 0.82 }
-    case 'direction-node': return { ...shared, showFaces: false, showEdges: false, assembly: 0.8 }
+    case 'icosa-assembly': return { ...shared, showFaces: false, showLabels: true, assembly: 0 }
+    case 'direction-node': return { ...shared, showFaces: false, showLabels: true, assembly: 0.72 }
     case 'zometool-node': return {
       ...shared,
       showFaces: false,
