@@ -76,8 +76,9 @@ sections:
         status: building
         url: works/trigonometry-human.html
         video:
-          status: planned
+          status: available
           label: B站视频
+          url: https://www.bilibili.com/video/BV1KDgf6zE89/
       - id: immortal-geometry
         title: 仙式几何
         description: 以卷轴式网页呈现的几何方法、构造与解题视角专题。

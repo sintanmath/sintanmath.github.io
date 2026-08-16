@@ -82,8 +82,9 @@ class GeneratedSiteTests(unittest.TestCase):
 
     def test_every_project_has_a_video_slot(self) -> None:
         homepage = (SITE / "index.html").read_text(encoding="utf-8")
-        self.assertEqual(homepage.count("视频待补充"), 3)
+        self.assertEqual(homepage.count("视频待补充"), 2)
         self.assertIn("BV1ZhdSB6E7E", homepage)
+        self.assertIn("BV1KDgf6zE89", homepage)
         for bvid in (
             "BV1BU4HzVE1j",
             "BV17o4vzLEAH",
