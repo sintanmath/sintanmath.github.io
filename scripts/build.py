@@ -392,6 +392,7 @@ def main() -> None:
     if STATIC.exists():
         shutil.copytree(STATIC, SITE, dirs_exist_ok=True)
 
+    (SITE / ".nojekyll").write_text("", encoding="utf-8")
     (SITE / "index.html").write_text(
         build_home(document), encoding="utf-8", newline="\n"
     )

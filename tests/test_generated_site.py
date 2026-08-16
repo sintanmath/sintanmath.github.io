@@ -18,6 +18,9 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("数学功法", homepage)
         self.assertIn("teorth.github.io/tao-web", homepage)
 
+    def test_pages_artifact_disables_jekyll(self) -> None:
+        self.assertTrue((SITE / ".nojekyll").exists())
+
     def test_building_placeholder_pages_exist(self) -> None:
         expected = [
             "apps/infinite-sum-game.html",
