@@ -85,7 +85,7 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertTrue(page.exists())
         self.assertIn("https://cdn.mathufo.com/zometool/builder/", content)
         self.assertIn("<iframe", content)
-        self.assertIn("并非仙童数学制作", content)
+        self.assertNotIn("并非仙童数学制作", content)
         self.assertIn("返回仙童数学主页", content)
         self.assertNotIn("<strong>制作中</strong>", content)
 

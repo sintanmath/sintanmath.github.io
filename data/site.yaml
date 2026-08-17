@@ -47,7 +47,7 @@ sections:
           label: B站视频
       - id: zometool-builder
         title: Zometool 虚拟构建
-        description: 嵌入第三方 vZome Lite，可在浏览器中用虚拟球杆搭建结构。本工具并非仙童数学制作。
+        description: 可在浏览器中用虚拟球杆搭建结构的 Zometool 交互构建器。
         status: available
         url: apps/zometool-builder/
         video:
