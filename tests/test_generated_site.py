@@ -18,6 +18,7 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("交互数学内容", homepage)
         self.assertIn("数学功法", homepage)
         self.assertIn("点 · 线 · 结构", homepage)
+        self.assertIn("Zometool 虚拟构建", homepage)
         self.assertIn("eml函数", homepage)
         self.assertIn("teorth.github.io/tao-web", homepage)
         self.assertIn("bili-spotlight", homepage)
@@ -78,6 +79,16 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertTrue((page.parent / "app.js").exists())
         self.assertTrue((page.parent / "simplifications.json").exists())
 
+    def test_zometool_builder_embeds_third_party_page(self) -> None:
+        page = SITE / "apps" / "zometool-builder" / "index.html"
+        content = page.read_text(encoding="utf-8")
+        self.assertTrue(page.exists())
+        self.assertIn("https://cdn.mathufo.com/zometool/builder/", content)
+        self.assertIn("<iframe", content)
+        self.assertIn("并非仙童数学制作", content)
+        self.assertIn("返回仙童数学主页", content)
+        self.assertNotIn("<strong>制作中</strong>", content)
+
     def test_workbench_app_is_published(self) -> None:
         page = SITE / "apps" / "geometric-discovery-workbench" / "index.html"
         self.assertTrue(page.exists())
@@ -100,7 +111,7 @@ class GeneratedSiteTests(unittest.TestCase):
 
     def test_every_project_has_a_video_slot(self) -> None:
         homepage = (SITE / "index.html").read_text(encoding="utf-8")
-        self.assertEqual(homepage.count("视频待补充"), 2)
+        self.assertEqual(homepage.count("视频待补充"), 3)
         self.assertIn("BV1ZhdSB6E7E", homepage)
         self.assertIn("BV1KDgf6zE89", homepage)
         for bvid in (

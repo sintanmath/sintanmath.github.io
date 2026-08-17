@@ -55,5 +55,6 @@ python3 -m venv .venv
 
 交互项目建议放在 `static/apps/<项目名>/`，需要打包的应用放在
 `apps/<项目名>/`；数学功法网页或 PDF 建议放在 `static/works/<项目名>/`。
+第三方工具用包装页 iframe 嵌入，不要把对方源码拷进仓库。
 构建时 `static/` 会被完整复制到 `site/`，`apps/` 中的项目会先构建再写入
 对应入口。
