@@ -5,7 +5,7 @@ site:
   description: >-
     仙童数学（sintanmath）的个人数学主页，集中整理数学科普内容、
     交互数学项目与数学功法。
-  footer: 本站内容由结构化数据生成，并持续维护；网站结构与样式参考 Terence Tao 的 tao-web。
+  footer: 本站内容由结构化数据生成，并持续维护。
 
 profile:
   heading: 个人介绍
@@ -14,18 +14,14 @@ profile:
       我是仙童数学，英文名 sintanmath，一名持续创作数学科普内容的博主。
       我希望把抽象概念转化为更直观、更有趣，也更容易参与的数学内容。
     - >-
-      公开内容涵盖趣味数学、几何、微积分、流形与微分几何导读、
-      数学工具等主题。这个主页用于长期整理视频之外的交互实验、
-      专题讲义和“数学功法”，让每个作品拥有独立、稳定的网页入口。
-    - >-
-      本站的数据驱动结构和克制的学术主页风格参考了数学家
-      Terence Tao 的 tao-web；具体内容与视觉表达则围绕仙童数学持续发展。
+      公开内容涵盖幼儿园到博士的一切数学主题。这个主页用于长期整理视频相关的交互实验、
+      专题讲义。
   links:
     - label: 仙童数学 · B站主页
       url: https://space.bilibili.com/490068376
     - label: GitHub 主页源码
       url: https://github.com/sintanmath/sintanmath.github.io
-    - label: Terence Tao · tao-web
+    - label: 永远的神 · Terence Tao
       url: https://teorth.github.io/tao-web/index.html
 
 sections:
