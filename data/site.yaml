@@ -70,6 +70,14 @@ sections:
           status: available
           label: B站视频
           url: https://www.bilibili.com/video/BV1ZhdSB6E7E
+      - id: cuspidal-cubic-addition
+        title: 三次曲线加法
+        description: 在 y² = x³ 等曲线上，用弦切法交互演示两点相加。
+        status: available
+        url: apps/cuspidal-cubic-addition/
+        video:
+          status: planned
+          label: B站视频
 
   - id: methods
     title: 数学功法

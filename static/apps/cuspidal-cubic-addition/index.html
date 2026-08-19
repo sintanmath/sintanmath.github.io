@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="在 y² = x³ 等三次曲线上，用弦切法交互演示两点相加。">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <title>三次曲线加法 — 仙童数学</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <section class="stage">
+      <canvas id="curve" aria-label="canvas"></canvas>
+    </section>
+
+    <aside class="panel">
+      <p class="home-nav"><a href="/">← 返回仙童数学主页</a></p>
+      <div class="block">
+        <h3>曲线</h3>
+        <select id="curve-select">
+          <option value="cusp">y² = x³</option>
+          <option value="node">y² = x³ + x²</option>
+          <option value="plus1">y² = x³ + 1</option>
+          <option value="minusx">y² = x³ − x</option>
+          <option value="minus2">y² = x³ − 2</option>
+          <option value="plusx">y² = x³ + x</option>
+        </select>
+      </div>
+
+      <div class="block">
+        <div class="row2">
+          <label><span id="p-param-name">t<sub>P</sub></span>
+            <input id="p-t" type="number" step="0.05" value="">
+            <input id="p-range" type="range" min="-8" max="8" step="0.01" value="1">
+          </label>
+          <label><span id="q-param-name">t<sub>Q</sub></span>
+            <input id="q-t" type="number" step="0.05" value="">
+            <input id="q-range" type="range" min="-8" max="8" step="0.01" value="2">
+          </label>
+        </div>
+        <div class="btns">
+          <button type="button" id="btn-demo">例</button>
+          <button type="button" id="btn-inv">−P</button>
+          <button type="button" id="btn-double">2P</button>
+          <button type="button" id="btn-replay">▶</button>
+          <button type="button" id="btn-fit">⊡</button>
+          <button type="button" id="btn-reset">↺</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>显示</h3>
+        <div class="toggles">
+          <label class="sw"><input type="checkbox" data-vis="axes" checked> 坐标轴</label>
+          <label class="sw"><input type="checkbox" data-vis="grid" checked> 网格</label>
+          <label class="sw"><input type="checkbox" data-vis="ticks" checked> 刻度</label>
+          <label class="sw"><input type="checkbox" data-vis="axisLabels"> 轴名</label>
+          <label class="sw"><input type="checkbox" data-vis="curve" checked> 曲线</label>
+          <label class="sw"><input type="checkbox" data-vis="cusp" checked> 奇点</label>
+          <label class="sw"><input type="checkbox" data-vis="chord" checked> 连线</label>
+          <label class="sw"><input type="checkbox" data-vis="third" checked> 第三交点</label>
+          <label class="sw"><input type="checkbox" data-vis="reflect" checked> 反射</label>
+          <label class="sw"><input type="checkbox" data-vis="sum" checked> 和点</label>
+          <label class="sw"><input type="checkbox" data-vis="preview" checked> 预览</label>
+          <label class="sw"><input type="checkbox" data-vis="hover" checked> 悬停</label>
+          <label class="sw"><input type="checkbox" data-vis="names"> 点名</label>
+          <label class="sw"><input type="checkbox" data-vis="coords"> 坐标</label>
+          <label class="sw"><input type="checkbox" data-vis="t"> t</label>
+          <label class="sw"><input type="checkbox" data-vis="glow"> 光晕</label>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>行为</h3>
+        <div class="toggles">
+          <label class="sw"><input type="checkbox" data-vis="animate" checked> 动画</label>
+          <label class="sw"><input type="checkbox" data-vis="autofit" checked> 自动框选</label>
+          <label class="sw"><input type="checkbox" data-vis="snap" checked> 吸附曲线</label>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>尺寸</h3>
+        <label>曲线
+          <input id="curve-w" type="range" min="0.6" max="10" step="0.1" value="2.6">
+        </label>
+        <label>连线
+          <input id="line-w" type="range" min="0.4" max="8" step="0.1" value="1.6">
+        </label>
+        <label>点
+          <input id="point-r" type="range" min="2" max="16" step="0.5" value="6.5">
+        </label>
+        <label>网格密度
+          <input id="grid-step" type="range" min="0.25" max="2" step="0.25" value="1">
+        </label>
+      </div>
+
+      <div class="block">
+        <h3>颜色</h3>
+        <div class="colors">
+          <label>底 <input type="color" data-col="paper" value="#f7f4ee"></label>
+          <label>曲线 <input type="color" data-col="curve" value="#c45c26"></label>
+          <label>轴 <input type="color" data-col="axis" value="#8a8176"></label>
+          <label>P <input type="color" data-col="p" value="#d64545"></label>
+          <label>Q <input type="color" data-col="q" value="#2a7d6f"></label>
+          <label>R′ <input type="color" data-col="rp" value="#6b5ea8"></label>
+          <label>和 <input type="color" data-col="sum" value="#c9a227"></label>
+          <label>线 <input type="color" data-col="chord" value="#b7a48c"></label>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

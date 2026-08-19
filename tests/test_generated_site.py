@@ -20,6 +20,7 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("点 · 线 · 结构", homepage)
         self.assertIn("Zometool 虚拟构建", homepage)
         self.assertIn("eml函数", homepage)
+        self.assertIn("三次曲线加法", homepage)
         self.assertIn("teorth.github.io/tao-web", homepage)
         self.assertIn("bili-spotlight", homepage)
         self.assertIn("粉丝", homepage)
@@ -89,6 +90,17 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("返回仙童数学主页", content)
         self.assertNotIn("<strong>制作中</strong>", content)
 
+    def test_cubic_addition_app_is_published(self) -> None:
+        page = SITE / "apps" / "cuspidal-cubic-addition" / "index.html"
+        self.assertTrue(page.exists())
+        content = page.read_text(encoding="utf-8")
+        self.assertIn("三次曲线加法", content)
+        self.assertIn("y² = x³", content)
+        self.assertIn("返回仙童数学主页", content)
+        self.assertNotIn("<strong>制作中</strong>", content)
+        self.assertTrue((page.parent / "app.js").exists())
+        self.assertTrue((page.parent / "styles.css").exists())
+
     def test_workbench_app_is_published(self) -> None:
         page = SITE / "apps" / "geometric-discovery-workbench" / "index.html"
         self.assertTrue(page.exists())
@@ -111,7 +123,7 @@ class GeneratedSiteTests(unittest.TestCase):
 
     def test_every_project_has_a_video_slot(self) -> None:
         homepage = (SITE / "index.html").read_text(encoding="utf-8")
-        self.assertEqual(homepage.count("视频待补充"), 3)
+        self.assertEqual(homepage.count("视频待补充"), 4)
         self.assertIn("BV1ZhdSB6E7E", homepage)
         self.assertIn("BV1KDgf6zE89", homepage)
         for bvid in (
