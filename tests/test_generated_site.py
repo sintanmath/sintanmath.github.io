@@ -25,6 +25,8 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("bili-spotlight", homepage)
         self.assertIn("粉丝", homepage)
         self.assertIn("space.bilibili.com/490068376", homepage)
+        self.assertIn("仙童绝密资料", homepage)
+        self.assertIn("pan.quark.cn/s/bd56c33e41cd", homepage)
         self.assertNotIn("个视频", homepage)
         snapshot = json.loads((ROOT / "data" / "bilibili.json").read_text(encoding="utf-8"))
         if snapshot.get("play"):
