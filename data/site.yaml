@@ -28,8 +28,8 @@ profile:
 
 sections:
   - id: interactive
-    title: 交互数学内容
-    eyebrow: Interactive mathematics
+    title: 数学法器
+    eyebrow: 交互数学内容
     description: >-
       可在浏览器中直接操作的数学实验、游戏与可视化工具。
       每个项目都是相互独立的网页应用。

@@ -15,6 +15,7 @@ class GeneratedSiteTests(unittest.TestCase):
         self.assertIn("仙童数学", homepage)
         self.assertIn("sintanmath", homepage)
         self.assertIn("个人介绍", homepage)
+        self.assertIn("数学法器", homepage)
         self.assertIn("交互数学内容", homepage)
         self.assertIn("数学功法", homepage)
         self.assertIn("点 · 线 · 结构", homepage)

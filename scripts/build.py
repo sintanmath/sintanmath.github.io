@@ -656,7 +656,7 @@ def build_home(document: dict) -> str:
 
 
 def build_placeholder(item: dict, section: dict, site: dict) -> str:
-    kind_label = "交互数学内容" if section["kind"] == "interactive" else "数学功法"
+    kind_label = "数学法器" if section["kind"] == "interactive" else "数学功法"
     resource = item.get("resource")
     if resource:
         format_note = "网页讲义仍在整理。配套课件已放在夸克网盘，点击即可打开。"
