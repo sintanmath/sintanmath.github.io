@@ -78,6 +78,8 @@ class GeneratedSiteTests(unittest.TestCase):
         content = page.read_text(encoding="utf-8")
         self.assertIn("EML 单算子常数构造器", content)
         self.assertIn("返回仙童数学主页", content)
+        self.assertIn("只保证视频里演示过的内容能正确运行", content)
+        self.assertIn("提 PR", content)
         self.assertNotIn("<strong>制作中</strong>", content)
         self.assertTrue((page.parent / "app.js").exists())
         self.assertTrue((page.parent / "simplifications.json").exists())

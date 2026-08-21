@@ -49,6 +49,23 @@ header {
   text-decoration: underline;
 }
 
+.scope-note {
+  max-width: 36rem;
+  margin: 0 auto 16px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.scope-note a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.scope-note a:hover {
+  text-decoration: underline;
+}
+
 header h1 {
   font-size: 30px;
   margin: 0 0 10px;
